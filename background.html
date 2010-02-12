@@ -12,23 +12,11 @@
         id: song.post_url,
         url: song.song_url,
         onloadfailed: function(){playnextsong(song.post_url)},
-        onplay: function(){set_nowplaying(song.post_url)},
         onfinish: function(){playnextsong(song.post_url)}
       });
   });
   
-  function set_nowplaying(post_url) {
-    nowplaying = post_url;
-  }
-  
-  function paused() {
-    console.log('paused');
-  }
-  
   function playnextsong(previous_song) {
-    if(!previous_song) {
-      previous_song = nowplaying;
-    }
     var bad_idea;
     for (x in playlist) {
       if (playlist[x] != previous_song && bad_idea == previous_song) {

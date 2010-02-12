@@ -124,21 +124,30 @@ function play(song_url,post_url) {
   sm.stopAll();
   var mySoundObject = sm.getSoundById(post_url);
   mySoundObject.play();
-  bg.set_nowplaying = post_url;
-  update_nowplaying();
+}
+
+function get_currentsong() {
+  var song_nowplaying = null;
+	for (sound in sm.sounds) {
+		if (sm.sounds[sound].playState == 1 && !song_nowplaying) {
+			song_nowplaying = sm.sounds[sound];
+		}
+	}
+	return song_nowplaying;
 }
 
 function update_nowplaying() {
-  if (bg.nowplaying) {
+  var song_nowplaying = get_currentsong();
+  if (song_nowplaying) {
 		var nowplaying = document.getElementById('nowplaying');
-    nowplaying.innerHTML = '<span>Now Playing: '+bg.nowplaying+'</span>';
-  }
+		nowplaying.innerHTML = '<span>Now Playing: '+song_nowplaying.sID+'</span>';
+	}
 }
 
 function playnextsong() {
-  current_song = sm.getSoundById(bg.nowplaying);
+  current_song = get_currentsong();
   current_song.stop();
-  bg.playnextsong(bg.nowplaying);
+  bg.playnextsong(current_song.sID);
   update_nowplaying();
 }
 
