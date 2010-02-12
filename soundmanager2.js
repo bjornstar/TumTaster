@@ -39,6 +39,7 @@ function SoundManager(smURL, smID) {
     'autoPlay': false,             // enable playing of file as soon as possible (much faster if "stream" is true)
     'onid3': null,                 // callback function for "ID3 data is added/available"
     'onload': null,                // callback function for "load finished"
+    'onloadfailed': null,					 //	callback function for "load failed"
     'whileloading': null,          // callback function for "download progress update" (X of Y bytes received)
     'onplay': null,                // callback for "play" start
     'onpause': null,               // callback for "pause"
@@ -1485,6 +1486,13 @@ if (_s.debugMode) {
       }
 
     };
+    
+    this.loadfailed = function() {
+			if (_t._iO.onloadfailed) {
+				_s._wD('SMSound.onloadfailed(): "'+_t.sID+'"');
+				_t._iO.onloadfailed.apply(_t);
+			}
+		};
 
     this.unload = function() {
       // Flash 8/AS2 can't "close" a stream - fake it by loading an empty MP3
@@ -1781,6 +1789,9 @@ if (_s.debugMode) {
       }
       _t.loaded = bSuccess;
       _t.readyState = bSuccess?3:2;
+			if (_t.readyState==2) {
+				_t.loadfailed();
+			}
       if (_t._iO.onload) {
         _t._iO.onload.apply(_t);
       }

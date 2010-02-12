@@ -114,7 +114,6 @@
 var bg = chrome.extension.getBackgroundPage();
 var sm = bg.soundManager;
 var pl = bg.playlist;
-var nowplaying = document.getElementById('nowplaying');
 
 function pause() {
   current_song = sm.getSoundById(bg.nowplaying);
@@ -131,6 +130,7 @@ function play(song_url,post_url) {
 
 function update_nowplaying() {
   if (bg.nowplaying) {
+		var nowplaying = document.getElementById('nowplaying');
     nowplaying.innerHTML = '<span>Now Playing: '+bg.nowplaying+'</span>';
   }
 }
