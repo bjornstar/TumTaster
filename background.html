@@ -1,0 +1,43 @@
+<html>
+<script type="text/javascript" src="soundmanager2.js"></script>
+<script type="text/javascript">
+  var playlist = new Array();
+  var nowplaying = null;
+
+  chrome.extension.onRequest.addListener(
+    function(song, sender, sendResponse) {
+      sendResponse({});
+      playlist[song.song_url] = song.post_url;
+      var mySoundObject = soundManager.createSound({
+        id: song.post_url,
+        url: song.song_url,
+        onplay: function(){nowplaying = this.id},
+        onfinish: function(){playnextsong(song.post_url)}
+      });
+  });
+  
+  function set_nowplaying(post_url) {
+    nowplaying = post_url;
+  }
+  
+  function paused() {
+    console.log('paused');
+  }
+  
+  function playnextsong(previous_song) {
+    if(!previous_song) {
+      previous_song = nowplaying;
+    }
+    var bad_idea;
+    for (x in playlist) {
+      if (playlist[x] != previous_song && bad_idea == previous_song) {
+        var mySoundObject = soundManager.getSoundById(playlist[x]);
+        mySoundObject.play();
+        return;
+      }
+      bad_idea = playlist[x];
+    }
+  }
+</script>
+<h1>Tumtaster</h1>
+</html>

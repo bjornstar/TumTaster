@@ -1,0 +1,153 @@
+<html>
+<style type="text/css">
+  html{
+    color:black;
+    font-family:arial,helvetica,sans-serif;
+    margin:0;
+    padding:0;
+    background-color:#2C4762;
+    background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAARHCAIAAAC9OZ68AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAc9JREFUeNrsVlF2wzAIQzvXLrKD7PyqYwMWdry+fi8fvDYuAQESrn3//H6Z2RtjM5QztjPEGZshPil+SD/aOB/vSDx6LPg5Iz7amclz4BBcyzthSP+DBV6NSfhZYGOPAa3N41642P3Zc/Vz7nnyN4sYvMEn/VhyjV5i5Lzw0GMWH+8x95r3PrDmKz3d59Kfrx5fuDH7ljgcS/QpejPqDNzuj4ml+3ptOM3WIi+yb1nv1sfJRWbfWWrvHPSeDSysfCjzEDzBkzssztOVT6O+4BRvcsze7dpB8c2eBc993rb0dNehzNAGtyeulQdMrdZaFi7pb5LjVm9XLRR9ouJkwTN5zVUDkRuhcxRenrWOyqklJ0LP/XvjSosHzhmmb/Js1Ysd+COaMJlrzE60XeOrZid2tB4SPO8x0a/qj7Jre7yeD6IXK3pRvMRhX/LmPsg5L99jf0Zturus8hvCD3q/Bt+w+P+hJVs1E7uFdYfnvnIO5V0me0x33hWHdZfEe1VHdtytlQvrfSH3KKrmw3/0gkVvYw/s/Kqc0Lkh61TMdV9i7vV4zr0XvdN+Dm5CPiNfnvvdzpu7r2gX9vk9/thjjz322GOfGN7/h3js39tLgAEA5+M4ca0bVE0AAAAASUVORK5CYII=);
+    background-repeat:repeat-x;
+  }
+  h1{
+    color:black;
+  }
+  a {
+    color:white;
+    text-decoration:none;
+  }
+  ol{
+    background-attachment: scroll;
+    background-clip: border-box;
+    background-color: #2C4762;
+    background-image: none;
+    background-origin: padding-box;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    display: block;
+    list-style-type:none;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    outline-color: #444;
+    outline-style: none;
+    outline-width: 0px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 20px;
+  }
+  li a{
+    color:#444;
+  }
+  li{
+    background-color: white;
+    border-bottom-color: #BBB;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    display: list-item;
+    margin-bottom: 10px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    outline-color: #444;
+    outline-style: none;
+    outline-width: 0px;
+    padding-bottom: 15px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 15px;
+    position: relative;
+    word-wrap: break-word;
+  }
+  div#nowplaying {
+    background-attachment: scroll;
+    background-clip: border-box;
+    background-color: #BBC552;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAARCAMAAAAi9pZaAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAxQTFRFzdVozdRozNRozNRnfqYzEAAAADRJREFUeNpci8kRADAIAjn67zmI4yc+FBYESWQ0C9TeJUrisCaHiT7UR6natdbYr1/wBBgAClIAMo7zpuYAAAAASUVORK5CYII=);
+    background-origin: padding-box;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    color: #C4CDD6;
+    display: block;
+    font-family: 'Lucida Grande', Verdana, sans-serif;
+    font-size: 13px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    height: 17px;
+    line-height: normal;
+    outline-color: #C4CDD6;
+    outline-style: none;
+    outline-width: 0px;
+    padding-bottom: 9px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 8px;
+    position: relative;
+  }
+  div#nowplaying span{
+    color: #3B440F;
+    cursor: auto;
+    display: inline;
+    height: 0px;
+    outline-color: #3B440F;
+    outline-style: none;
+    outline-width: 0px;
+    text-decoration: none;
+    width: 0px;
+  }
+</style>
+<h1>ChromeTaster</h1>
+<div id="nowplaying"><span>Now Playing: </span></div>
+<p><a href="javascript:void(sm.stopAll())">Stop</a> <a href="javascript:void(pause())">Pause</a> <a href="javascript:void(sm.resumeAll())">Resume</a> <a href="javascript:void(playnextsong())">Next</a></p>
+<script type="text/javascript">
+var bg = chrome.extension.getBackgroundPage();
+var sm = bg.soundManager;
+var pl = bg.playlist;
+var nowplaying = document.getElementById('nowplaying');
+
+function pause() {
+  current_song = sm.getSoundById(bg.nowplaying);
+  current_song.pause();
+}
+
+function play(song_url,post_url) {
+  sm.stopAll();
+  var mySoundObject = sm.getSoundById(post_url);
+  mySoundObject.play();
+  bg.set_nowplaying = post_url;
+  update_nowplaying();
+}
+
+function update_nowplaying() {
+  if (bg.nowplaying) {
+    nowplaying.innerHTML = '<span>Now Playing: '+bg.nowplaying+'</span>';
+  }
+}
+
+function playnextsong() {
+  current_song = sm.getSoundById(bg.nowplaying);
+  current_song.stop();
+  bg.playnextsong(bg.nowplaying);
+  update_nowplaying();
+}
+
+update_nowplaying();
+
+document.write('<ol class="playlist">');
+for (x in pl) {
+  document.write('<li><a href="javascript:void(play(\''+x+'\',\''+pl[x]+'\'))">'+pl[x]+'</a><br />\r\n');
+}
+document.write('</ol>');
+</script>
+</html>
