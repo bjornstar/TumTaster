@@ -116,7 +116,7 @@ var sm = bg.soundManager;
 var pl = bg.playlist;
 
 function pause() {
-  current_song = sm.getSoundById(bg.nowplaying);
+  current_song = get_currentsong();
   current_song.pause();
 }
 
