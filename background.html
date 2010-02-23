@@ -27,6 +27,14 @@
       bad_idea = playlist[x];
     }
   }
+  
+  function playrandomsong(previous_song) {
+		var x = Math.floor(Math.random()*soundManager.soundIDs.length+1);
+		var mySoundObject = soundManager.getSoundById(soundManager.soundIDs[x]);
+		mySoundObject.play();
+		return;
+	}
+		
 </script>
 <h1>ChromeTaster</h1>
 </html>
