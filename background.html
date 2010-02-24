@@ -17,22 +17,39 @@
   });
   
   function playnextsong(previous_song) {
-    var bad_idea;
-    for (x in playlist) {
-      if (playlist[x] != previous_song && bad_idea == previous_song) {
-        var mySoundObject = soundManager.getSoundById(playlist[x]);
-        mySoundObject.play();
-        return;
+    var bad_idea = null;
+    var first_song = null;
+    var next_song = null;
+
+    for (x in soundManager.sounds) {
+      if (soundManager.sounds[x].sID != previous_song && bad_idea == previous_song && next_song == null) {
+        next_song = soundManager.sounds[x].sID;
       }
-      bad_idea = playlist[x];
+      bad_idea = soundManager.sounds[x].sID;
+      if (first_song == null) {
+        first_song = soundManager.sounds[x].sID;
+      }
+    }
+
+    if (localStorage["shuffle"]) {
+      var s = Math.floor(Math.random()*soundManager.soundIDs.length+1);
+      next_song = soundManager.soundIDs[s];
+    }
+    
+    if (localStorage["repeat"] && bad_idea == previous_song) {
+      next_song = first_song;
+    }
+    
+    if (next_song != null) {
+      var soundNext = soundManager.getSoundById(next_song);
+      soundNext.play();
     }
   }
   
   function playrandomsong(previous_song) {
 		var x = Math.floor(Math.random()*soundManager.soundIDs.length+1);
-		var mySoundObject = soundManager.getSoundById(soundManager.soundIDs[x]);
-		mySoundObject.play();
-		return;
+    var mySoundObject = soundManager.getSoundById(soundManager.soundIDs[x]);
+    mySoundObject.play();
 	}
 		
 </script>

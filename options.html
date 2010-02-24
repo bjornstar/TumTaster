@@ -1,47 +1,67 @@
 <html>
 <head>
-	<title>Options for Color Chooser</title>
+	<title>Options for ChromeTaster</title>
 	<script type="text/javascript">
-var defaultColor = "blue";
+var defaultShuffle = false;
+var defaultRepeat = true;
 
 function loadOptions() {
-	var favColor = localStorage["favColor"];
+  var shuffle = localStorage["shuffle"];
+  var repeat = localStorage["repeat"];
 
-	// valid colors are red, blue, green and yellow
-	if (favColor == undefined || (favColor != "red" && favColor != "blue" && favColor != "green" && favColor != "yellow")) {
-		favColor = defaultColor;
-	}
+  if (shuffle == undefined) {
+    shuffle = defaultShuffle;
+  }
 
-	var select = document.getElementById("color");
-	for (var i = 0; i < select.children.length; i++) {
-		var child = select.children[i];
-			if (child.value == favColor) {
-			child.selected = "true";
-			break;
-		}
-	}
+  if (repeat == undefined) {
+    repeat = defaultRepeat;
+  }
+
+  var select = document.getElementById("optionShuffle");
+  for (var i = 0; i < select.children.length; i++) {
+    var child = select.children[i];
+    if (child.value == shuffle) {
+      child.selected = "true";
+      break;
+    }
+  }
+  
+  var select = document.getElementById("optionRepeat");
+  for (var i = 0; i < select.children.length; i++) {
+    var child = select.children[i];
+    if (child.value == repeat) {
+      child.selected = "true";
+      break;
+    }
+  }
 }
 
 function saveOptions() {
-	var select = document.getElementById("color");
-	var color = select.children[select.selectedIndex].value;
-	localStorage["favColor"] = color;
+	var selectShuffle = document.getElementById("optionShuffle");
+	localStorage["shuffle"] = selectShuffle.children[selectShuffle.selectedIndex].value;
+  var selectRepeat = document.getElementById("optionRepeat");
+  localStorage["repeat"] = selectRepeat.children[selectRepeat.selectedIndex].value;
 }
 
 function eraseOptions() {
-	localStorage.removeItem("favColor");
+	localStorage.removeItem("shuffle");
+	localStorage.removeItem("repeat");
 	location.reload();
 }
 	</script>
 </head>
 <body onload="loadOptions()">
-	<h1>Favorite Color</h1>
-	<select id="color">
-		<option value="blue">Blue</option>
-		<option value="red">Red</option>
-		<option value="green">Green</option>
-		<option value="yellow">Yellow</option>
+	<h1>ChromeTaster Options</h1>
+	<label for="optionShuffle">Shuffle: </label>
+	<select id="optionShuffle" name="optionShuffle">
+		<option value="false">Off</option>
+		<option value="true">On</option>
 	</select>
+	<label for="optionRepeat">Repeat: </label>
+	<select id="optionRepeat" name="optionRepeat">
+    <option value="false">Off</option>
+    <option value="true">On</option>
+  </select>
 	<br />
 	<button onclick="saveOptions()">Save</button>
 	<br />

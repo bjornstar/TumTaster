@@ -108,8 +108,9 @@
   }
 </style>
 <h1>ChromeTaster</h1>
+<div id="statistics"><span>No songs found.</span></div>
 <div id="nowplaying"><span>Now Playing: </span></div>
-<p><a href="javascript:void(sm.stopAll())">Stop</a> <a href="javascript:void(pause())">Pause</a> <a href="javascript:void(sm.resumeAll())">Resume</a> <a href="javascript:void(playnextsong())">Next</a> <a href="javascript:void(playrandomsong())">Random</a></p>
+<p><a href="javascript:void(sm.stopAll())">&#x25A0;</a>&nbsp;&nbsp;<a href="javascript:void(pause())">&#x2759; &#x2759;</a>&nbsp;&nbsp;<a href="javascript:void(sm.resumeAll())">&#x25b6;</a>&nbsp;&nbsp;<a href="javascript:void(playnextsong())">&#x25b6;&#x25b6;</a>&nbsp;&nbsp;<a href="javascript:void(playrandomsong())">Random</a></p>
 <script type="text/javascript">
 var bg = chrome.extension.getBackgroundPage();
 var sm = bg.soundManager;
@@ -144,6 +145,13 @@ function update_nowplaying() {
 	}
 }
 
+function update_statistics() {
+  var count_songs = 0;
+  count_songs = sm.soundIDs.length;
+  var statistics = document.getElementById('statistics');
+  statistics.innerHTML = '<span>'+count_songs+' songs found.</span>';
+}
+
 function playnextsong() {
   var current_song = get_currentsong();
   var current_song_sID;
@@ -167,6 +175,7 @@ function playrandomsong() {
 }
 
 update_nowplaying();
+update_statistics();
 
 document.write('<ol class="playlist">');
 for (x in pl) {
