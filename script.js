@@ -73,3 +73,28 @@ function taste() {
 }
 
 setInterval(taste, 200);
+
+function fixaudiopagination() {
+	var nextpagelink = document.getElementById('next_page_link');
+	var prevpagelink = document.getElementById('previous_page_link');
+	var currentpage = window.location.href;
+
+	var pagenumber = parseInt(currentpage.substring(currentpage.lastIndexOf('/')+1));
+	if (isNaN(pagenumber)) {
+		nextpagelink.href = currentpage+'/2';
+	} else {
+		nextpagelink.href = currentpage.substring(0,currentpage.lastIndexOf('/')+1)+(pagenumber+1);
+	}
+	if (prevpagelink) {
+		prevpagelink.href = currentpage.substring(0,currentpage.lastIndexOf('/')+1)+(pagenumber-1);
+	}
+	
+	var dashboard_controls = document.getElementById('dashboard_controls');
+	if (dashboard_controls) {
+		dashboard_controls.children[0].href = currentpage.substring(0,currentpage.lastIndexOf('/')+1)+1;
+		dashboard_controls.children[1].children[0].href = currentpage.substring(0,currentpage.lastIndexOf('/')+1)+(pagenumber-1);
+		dashboard_controls.children[1].children[2].href = currentpage.substring(0,currentpage.lastIndexOf('/')+1)+(pagenumber+1);
+	}
+}
+
+fixaudiopagination();
