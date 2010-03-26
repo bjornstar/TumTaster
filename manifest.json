@@ -3,12 +3,15 @@
   "version": "0.1",
   "description": "A Chrome extension that keeps track of the MP3s you see and queues them up for playback. (Currently only works on Tumblr)",
   "browser_action": {
-    "default_icon": "tumblr.gif",
+    "default_icon": "tumblr-audio-icon-16.png",
     "default_title": "ChromeTaster",
     "popup": "popup.html"
   },
   "icons": { 
-    "16": "tumblr.gif"
+    "16": "tumblr-audio-icon-16.png",
+    "32": "tumblr-audio-icon-32.png",
+    "48": "tumblr-audio-icon-48.png",
+    "64": "tumblr-audio-icon-64.png"
   },
   "background_page": "background.html",
   "options_page"	: "options.html",

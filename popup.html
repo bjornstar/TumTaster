@@ -84,7 +84,6 @@
     font-style: normal;
     font-variant: normal;
     font-weight: normal;
-    height: 17px;
     line-height: normal;
     outline-color: #C4CDD6;
     outline-style: none;
@@ -94,6 +93,7 @@
     padding-right: 10px;
     padding-top: 8px;
     position: relative;
+    clear: left;
   }
   div#nowplaying span{
     color: #3B440F;
@@ -106,11 +106,25 @@
     text-decoration: none;
     width: 0px;
   }
+  div#heading h1{
+		color: white;
+		float: left;
+		line-height:32px;
+		vertical-align:absmiddle;
+		margin-left:10px;
+	}
+	div#statistics{
+		position:absolute;
+		bottom:0%;
+	}
+	#controls{
+		text-align:center;
+	}
 </style>
-<h1>ChromeTaster</h1>
+<div id="heading" style="width:100%;height:64px;"><img src="tumblr-audio-icon-64.png" style="float:left;" /><h1>ChromeTaster</h1></div>
 <div id="statistics"><span>No songs found.</span></div>
 <div id="nowplaying"><span>Now Playing: </span></div>
-<p><a href="javascript:void(sm.stopAll())">&#x25A0;</a>&nbsp;&nbsp;<a href="javascript:void(pause())">&#x2759; &#x2759;</a>&nbsp;&nbsp;<a href="javascript:void(sm.resumeAll())">&#x25b6;</a>&nbsp;&nbsp;<a href="javascript:void(playnextsong())">&#x25b6;&#x25b6;</a>&nbsp;&nbsp;<a href="javascript:void(playrandomsong())">Random</a></p>
+<p id="controls"><a href="javascript:void(sm.stopAll())">&#x25A0;</a>&nbsp;&nbsp;<a href="javascript:void(pause())">&#x2759; &#x2759;</a>&nbsp;&nbsp;<a href="javascript:void(sm.resumeAll())">&#x25b6;</a>&nbsp;&nbsp;<a href="javascript:void(playnextsong())">&#x25b6;&#x25b6;</a>&nbsp;&nbsp;<a href="javascript:void(playrandomsong())">Random</a></p>
 <script type="text/javascript">
 var bg = chrome.extension.getBackgroundPage();
 var sm = bg.soundManager;

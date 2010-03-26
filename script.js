@@ -79,7 +79,7 @@ function fixaudiopagination() {
 	var prevpagelink = document.getElementById('previous_page_link');
 	var currentpage = window.location.href;
 
-	if (currentpage.indexOf('dashboard')>=0) {
+	if (currentpage.indexOf('show/audio')<0) {
 		return;
 	}
 
