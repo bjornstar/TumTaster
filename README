@@ -1,7 +1,13 @@
-ChromeTaster v0.1
+ChromeTaster v0.2
 By Bjorn Stromberg
 
 This is a Chrome extension that slurps up all the links to MP3s that you see and queues them up for playback. It's built on top of a greasemonkey script that I wrote called TumTaster that creates download links for MP3s on Tumblr.
+
+IMPORTANT: To get MP3 playback to work you must add this extension to the flash allow list. You must visit this page - http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html and add the following line:
+
+chrome-extension:\\igkglbhdogeemdmnfdjgapgacfhgiikd\
+
+I have tried Chrome's HTML5 support, but found their player to be absolutely unusable due to the amateur hour 0.5 second buffer causing awful interaction delays. When they fix this I'll switch it over to HTML5, until then you must add this extension to your flash allow list.
 
 ChromeTaster uses SoundManager2 for it's MP3 playback. You can get more information about SoundManager2 at: http://www.schillmania.com/projects/soundmanager2
 
