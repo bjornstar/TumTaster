@@ -12,7 +12,7 @@
   h1{
     color:black;
   }
-  a {
+  a{
     color:white;
     text-decoration:none;
   }
@@ -67,7 +67,7 @@
     position: relative;
     word-wrap: break-word;
   }
-  div#nowplaying {
+  #nowplayingdiv {
     background-attachment: scroll;
     background-clip: border-box;
     background-color: #BBC552;
@@ -95,7 +95,7 @@
     position: relative;
     clear: left;
   }
-  div#nowplaying span{
+  #nowplayingdiv span{
     color: #3B440F;
     cursor: auto;
     display: inline;
@@ -120,10 +120,50 @@
 	#controls{
 		text-align:center;
 	}
+#statusbar{
+position:relative;
+height:12px;
+background-color:#CDD568;
+border:2px solid #eaf839;
+border-radius:2px;
+-moz-border-radius:2px;
+-webkit-border-radius:2px;
+overflow:hidden;
+margin-top:4px;
+}
+
+.position, .position2, .loading{
+position:absolute;
+left:0px;
+bottom:0px;
+height:12px;
+}
+.position{
+background-color: #3B440F;
+border-right:2px solid #3B440F;
+border-radius:2px;
+-moz-border-radius:2px;
+-webkit-border-radius:2px;
+}
+.position2{
+background-color:#eaf839;
+}
+.loading {
+background-color:#BBC552;
+}
+
+
 </style>
 <div id="heading" style="width:100%;height:64px;"><img src="tumblr-audio-icon-64.png" style="float:left;" /><h1>ChromeTaster</h1></div>
 <div id="statistics"><span>No songs found.</span></div>
-<div id="nowplaying"><span>Now Playing: </span></div>
+<div id="nowplayingdiv"><span id="nowplaying">Now Playing: </span>
+<div id="statusbar">
+<div id="loading" class="loading">&nbsp;</div>
+<div id="position2" class="position2">&nbsp;</div>
+<div id="position" class="position">&nbsp;</div>
+</div>
+</div>
+
 <p id="controls"><a href="javascript:void(sm.stopAll())">&#x25A0;</a>&nbsp;&nbsp;<a href="javascript:void(pause())">&#x2759; &#x2759;</a>&nbsp;&nbsp;<a href="javascript:void(sm.resumeAll())">&#x25b6;</a>&nbsp;&nbsp;<a href="javascript:void(playnextsong())">&#x25b6;&#x25b6;</a>&nbsp;&nbsp;<a href="javascript:void(playrandomsong())">Random</a></p>
 <script type="text/javascript">
 var bg = chrome.extension.getBackgroundPage();
@@ -139,6 +179,7 @@ function play(song_url,post_url) {
   sm.stopAll();
   var mySoundObject = sm.getSoundById(post_url);
   mySoundObject.play();
+  update_nowplaying();
 }
 
 function get_currentsong() {
@@ -155,7 +196,7 @@ function update_nowplaying() {
   var current_song = get_currentsong();
   if (current_song) {
 		var nowplaying = document.getElementById('nowplaying');
-		nowplaying.innerHTML = '<span>Now Playing: '+current_song.sID+'</span>';
+		nowplaying.innerHTML = 'Now Playing: '+current_song.sID;
 	}
 }
 
@@ -196,5 +237,23 @@ for (x in pl) {
   document.write('<li><a href="javascript:void(play(\''+x+'\',\''+pl[x]+'\'))">'+pl[x]+'</a><br />\r\n');
 }
 document.write('</ol>');
+
+var div_loading = document.getElementById('loading');
+var div_position = document.getElementById('position');
+var div_position2 = document.getElementById('position2');
+
+function updateStatus() {
+	var current_song = get_currentsong();
+	if (current_song.bytesTotal > 0) {
+		div_loading.style.width = (100 * current_song.bytesLoaded / current_song.bytesTotal) + '%';
+	}
+	div_position.style.width = "20px";
+	div_position.style.left = (100 * current_song.position / current_song.durationEstimate) + '%';
+	div_position2.style.width = (100 * current_song.position / current_song.durationEstimate) + '%';
+}
+
+setInterval(updateStatus, 200);
+
+
 </script>
 </html>
