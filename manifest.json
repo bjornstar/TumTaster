@@ -1,6 +1,6 @@
 {
   "name": "ChromeTaster",
-  "version": "0.2",
+  "version": "0.2.1",
   "description": "A Chrome extension that keeps track of the MP3s you see and queues them up for playback. (Currently only works on Tumblr)",
   "browser_action": {
     "default_icon": "tumblr-audio-icon-16.png",
