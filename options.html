@@ -2,25 +2,24 @@
 <head>
 	<title>Options for ChromeTaster</title>
 	<script type="text/javascript">
-var defaultShuffle = false;
-var defaultRepeat = true;
+var defaultSettings = { 'shuffle': 'false', 'repeat': 'true', 'listBlack': ['beatles'], 'listWhite': ['bjorn', 'beck']}; //initialize default values.
 
 function loadOptions() {
-  var shuffle = localStorage["shuffle"];
-  var repeat = localStorage["repeat"];
+	var settings = localStorage['settings'];
 
-  if (shuffle == undefined) {
-    shuffle = defaultShuffle;
-  }
+	if (settings == undefined) {
+		settings = defaultSettings;
+	} else {
+		settings = JSON.parse(settings);
+	}
 
-  if (repeat == undefined) {
-    repeat = defaultRepeat;
-  }
+	console.log(settings['shuffle']);
+	console.log(settings['repeat']);
 
   var select = document.getElementById("optionShuffle");
   for (var i = 0; i < select.children.length; i++) {
     var child = select.children[i];
-    if (child.value == shuffle) {
+    if (child.value == settings['shuffle']) {
       child.selected = "true";
       break;
     }
@@ -29,29 +28,86 @@ function loadOptions() {
   var select = document.getElementById("optionRepeat");
   for (var i = 0; i < select.children.length; i++) {
     var child = select.children[i];
-    if (child.value == repeat) {
+    if (child.value == settings['repeat']) {
       child.selected = "true";
       break;
     }
   }
+  
+  for (var itemBlack in settings['listBlack']) {
+		addInput("Black", settings['listBlack'][itemBlack]);
+	}
+	
+	for (var itemWhite in settings['listWhite']) {
+		addInput("White", settings['listWhite'][itemWhite]);
+	}
+	
+	addInput("Black"); //prepare a blank input box.
+	addInput("White"); //prepare a blank input box.
+}
+
+function addInput(whichList, itemValue) {
+	if (itemValue == undefined) {
+		itemValue = "";
+	}
+	var garbageTruck = document.getElementById('list'+whichList);
+	garbageInput = document.createElement('input');
+	garbageInput.value = itemValue;
+	garbageInput.name = 'option'+whichList;
+	garbageInput.id = 'option'+whichList+document.getElementsByTagName('input').length;
+	garbageAdd = document.createElement('a');
+	garbageAdd.href = "#";
+	garbageAdd.setAttribute('onclick', 'removeInput(\'option'+whichList+document.getElementsByTagName('input').length+'\'); return false;');
+	garbageAdd.innerText = "remove";
+	garbageLinebreak = document.createElement('br');
+	garbageTruck.appendChild(garbageInput);
+	garbageTruck.appendChild(garbageAdd);
+	garbageTruck.appendChild(garbageLinebreak);
+}
+
+function removeInput(garbageWhich) {
+	var garbageInput = document.getElementById(garbageWhich);
+	garbageInput.parentNode.removeChild(garbageInput.nextSibling);
+	garbageInput.parentNode.removeChild(garbageInput.nextSibling);
+	garbageInput.parentNode.removeChild(garbageInput);
 }
 
 function saveOptions() {
-	var selectShuffle = document.getElementById("optionShuffle");
-	localStorage["shuffle"] = selectShuffle.children[selectShuffle.selectedIndex].value;
-  var selectRepeat = document.getElementById("optionRepeat");
-  localStorage["repeat"] = selectRepeat.children[selectRepeat.selectedIndex].value;
+	var settings = {};
+
+	var selectShuffle = document.getElementById('optionShuffle');
+	settings['shuffle'] = selectShuffle.children[selectShuffle.selectedIndex].value;
+  var selectRepeat = document.getElementById('optionRepeat');
+  settings['repeat'] = selectRepeat.children[selectRepeat.selectedIndex].value;
+
+	settings['listWhite'] = [];
+	settings['listBlack'] = [];
+
+	var garbages = document.getElementsByTagName('input');
+	for (var i = 0; i< garbages.length; i++) {
+		if (garbages[i].value != "") {
+			if (garbages[i].name.substring(0,11) == "optionWhite") {
+				settings['listWhite'].push(garbages[i].value);
+			} else if (garbages[i].name.substring(0,11) == "optionBlack") {
+				settings['listBlack'].push(garbages[i].value);
+			}
+		}
+	}
+	localStorage['settings'] = JSON.stringify(settings);
+  location.reload();
 }
 
 function eraseOptions() {
-	localStorage.removeItem("shuffle");
-	localStorage.removeItem("repeat");
+	localStorage.removeItem('settings');
 	location.reload();
 }
 	</script>
 </head>
 <body onload="loadOptions()">
-	<h1>ChromeTaster Options</h1>
+	<div style="width:100%;height:64px;">
+	<img src="tumblr-audio-icon-64.png" style="float:left;padding-right:10px;" />
+	<h1 style="line-height:64px;">ChromeTaster Options</h1>
+	</div>
 	<label for="optionShuffle">Shuffle: </label>
 	<select id="optionShuffle" name="optionShuffle">
 		<option value="false">Off</option>
@@ -62,6 +118,18 @@ function eraseOptions() {
     <option value="false">Off</option>
     <option value="true">On</option>
   </select>
+	<br />
+	<div id="listBlack">
+		<h2>Black List</h2>
+		<p>Do not add music with these words:</p>
+		<a href="#" onclick="addInput('Black'); return false;">add</a><br />
+	</div>
+	<br />
+	<div id="listWhite">
+		<h2>White List</h2>
+		<p>Always add music with these words:</p>
+		<a href="#" onclick="addInput('White'); return false;">add</a><br />
+	</div>
 	<br />
 	<button onclick="saveOptions()">Save</button>
 	<br />

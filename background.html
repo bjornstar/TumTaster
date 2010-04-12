@@ -4,16 +4,20 @@
   var playlist = new Array();
   var nowplaying = null;
 
-  chrome.extension.onRequest.addListener(
+  chrome.extension.onRequest.addListener( // Yes, this is ugly, I know. I'll fix it later.
     function(song, sender, sendResponse) {
-      sendResponse({});
-      playlist[song.song_url] = song.post_url;
-      var mySoundObject = soundManager.createSound({
-        id: song.post_url,
-        url: song.song_url,
-        onloadfailed: function(){playnextsong(song.post_url)},
-        onfinish: function(){playnextsong(song.post_url)}
-      });
+			if (song == 'getSettings') {
+				sendResponse({settings: localStorage["settings"]});
+			} else {
+				playlist[song.song_url] = song.post_url;
+				var mySoundObject = soundManager.createSound({
+					id: song.post_url,
+					url: song.song_url,
+					onloadfailed: function(){playnextsong(song.post_url)},
+					onfinish: function(){playnextsong(song.post_url)}
+				});
+				sendResponse({});
+			}
   });
   
   function playnextsong(previous_song) {

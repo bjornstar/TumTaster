@@ -1,7 +1,9 @@
-ChromeTaster v0.2.1
+ChromeTaster v0.3
 By Bjorn Stromberg
 
 This is a Chrome extension that slurps up all the links to MP3s that you see and queues them up for playback. It's built on top of a greasemonkey script that I wrote called TumTaster that creates download links for MP3s on Tumblr.
+
+v0.3 Now has blacklists and whitelists so that you can prevent some songs from getting put onto your playlist. You can put in a username, artist, or song name. It will do partial matches, so be careful what you put in there.
 
 IMPORTANT: To get MP3 playback to work you must add this extension to the flash allow list. You must visit this page - http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html and add the following line:
 

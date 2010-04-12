@@ -16,8 +16,22 @@ try {
   addGlobalStyle('a.tumtaster {'+tumtaster_style+'}');
 }
 
+var settings;
 var last_embed = 0;
 var song_embed = document.getElementsByTagName('embed');
+
+function loadSettings() {
+	var defaultSettings = { 'shuffle': 'false', 'repeat': 'true', 'listBlack': ['beatles'], 'listWhite': ['bjorn', 'beck']}; //initialize default values.
+	chrome.extension.sendRequest('getSettings', function(response) {
+		savedSettings = response.settings;
+		if (savedSettings == undefined) {
+			settings = defaultSettings;
+		} else {
+			settings = JSON.parse(savedSettings);
+		}
+		setInterval(taste, 200);
+	});
+}
 
 function taste() {
 	for (var i=last_embed;i<song_embed.length;i++) {
@@ -47,32 +61,55 @@ function taste() {
       song_embed[i].parentNode.style.height='54px';
 
       var post_id = song_url.match(/audio_file\/(\d*)\//)[1];
-      
-      //Alright, here's the tough part. We gotta find the permalink for post to go with this audio file.
-      //There's probably a million ways to do this better.
-
       var post_url = 'http://www.tumblr.com/';
 
-      if (window.location.href.substring(0,31)=='http://www.tumblr.com/dashboard' || window.location.href.substring(0,36)=='http://www.tumblr.com/show/audio/by/') {
-        post_url = document.getElementById('permalink_'+post_id).parentNode.getAttribute('href');
-      } else {
-        var anchors = document.getElementsByTagName('a');
-        for (var a in anchors) {
-          if (anchors[a].href) {
-            if (anchors[a].href.indexOf('/post/'+post_id+'/')>=0) {
-              post_url = anchors[a].href;
-            }
-          }
-        }
-      }
+			// Find the post's URL.
+			var anchors = document.getElementsByTagName('a');
+			for (var a in anchors) {
+				if (anchors[a].href) {
+					if (anchors[a].href.indexOf('/post/'+post_id+'/')>=0) {
+						post_url = anchors[a].href;
+					}
+				}
+			}
 
-      chrome.extension.sendRequest({song_url: song_url, post_id: post_id, post_url: post_url});
+			if (window.location.href.substring(0,28)!='http://www.tumblr.com/reblog') { //If you're reblogging it don't add it to the playlist, it's already there.
+
+				//We check our white list to see if we should add it to the playlist.
+				var whitelisted = false;
+				var blacklisted = false;
+
+				//Only do contextual white list and black list on the dashboard, maybe I can come up with a universal way to do it in a later revision.
+				
+				if (window.location.href.substring(0,31)=='http://www.tumblr.com/dashboard' || window.location.href.substring(0,36)=='http://www.tumblr.com/show/audio/by/') {
+					var post = document.getElementById('post'+post_id);
+					
+					for (itemWhite in settings['listWhite']) {
+						if (post.innerHTML.toLowerCase().indexOf(settings['listWhite'][itemWhite].toLowerCase()) >= 0) {
+							whitelisted = true;
+							break;
+						}
+					}
+					
+					// If it's not on the white list, we check our black list to see if we shouldn't add it to the playlist.
+					if (!whitelisted) {
+						for (itemBlack in settings['listBlack']) {
+							if (post.innerHTML.toLowerCase().indexOf(settings['listBlack'][itemBlack].toLowerCase()) >= 0) {
+								blacklisted = true;
+								break;
+							}
+						}
+					}
+				}
+				
+				if (!blacklisted) {
+					chrome.extension.sendRequest({song_url: song_url, post_id: post_id, post_url: post_url});
+				}
+			}
 		}
 	}
 	last_embed = song_embed.length;
 }
-
-setInterval(taste, 200);
 
 function fixaudiopagination() {
 	var nextpagelink = document.getElementById('next_page_link');
@@ -102,3 +139,5 @@ function fixaudiopagination() {
 }
 
 fixaudiopagination();
+
+loadSettings();
