@@ -21,7 +21,7 @@ var last_embed = 0;
 var song_embed = document.getElementsByTagName('embed');
 
 function loadSettings() {
-	var defaultSettings = { 'shuffle': 'false', 'repeat': 'true', 'listBlack': ['beatles'], 'listWhite': ['bjorn', 'beck']}; //initialize default values.
+	var defaultSettings = { 'shuffle': 'false', 'repeat': 'true', 'listBlack': ['beatles'], 'listWhite': ['bjorn', 'beck'], 'listSites': ['http://*.tumblr.com/*', 'http://bjornstar.com/*'] }; //initialize default values.
 	chrome.extension.sendRequest('getSettings', function(response) {
 		savedSettings = response.settings;
 		if (savedSettings == undefined) {
@@ -29,8 +29,22 @@ function loadSettings() {
 		} else {
 			settings = JSON.parse(savedSettings);
 		}
-		setInterval(taste, 200);
+		if (checkurl(location.href, settings['listSites'])) {
+			setInterval(taste, 200);
+    }
 	});
+}
+
+function checkurl(url, filter) {
+  for (var f in filter) {
+    var filterRegex;
+    filterRegex=filter[f].replace(/\x2a/g, "(.*?)");
+    var re = new RegExp(filterRegex);
+    if (url.match(re)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function taste() {
