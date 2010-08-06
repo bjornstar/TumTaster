@@ -124,7 +124,7 @@
 
       function removeInput(garbageWhich) {
         var garbageInput = document.getElementById(garbageWhich);
-        garbageInput.parentNode.removeChild(garbageInput.nextSibling);
+        garbageInput.parentNode.removeChild(garbageInput.previousSibling);
         garbageInput.parentNode.removeChild(garbageInput.nextSibling);
         garbageInput.parentNode.removeChild(garbageInput);
       }
