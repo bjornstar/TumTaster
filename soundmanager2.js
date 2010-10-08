@@ -1953,4 +1953,5 @@ if (_s.debugMode) {
 
 if (typeof SM2_DEFER == 'undefined' || !SM2_DEFER) {
   soundManager = new SoundManager();
+  soundManager.beginDelayedInit();
 }

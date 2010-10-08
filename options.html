@@ -54,7 +54,7 @@
       }
     </style>
     <script type="text/javascript">
-      var defaultSettings = { 'shuffle': 'false', 'repeat': 'true', 'listBlack': ['beatles'], 'listWhite': ['bjorn', 'beck'], 'listSites': ['http://*.tumblr.com/*', 'http://bjornstar.com/*'] }; //initialize default values.
+      var defaultSettings = { 'shuffle': false, 'repeat': true, 'mp3player': 'flash', 'listBlack': ['beatles'], 'listWhite': ['bjorn', 'beck'], 'listSites': ['http://*.tumblr.com/*', 'http://bjornstar.com/*'] }; //initialize default values.
 
       function loadOptions() {
         var settings = localStorage['settings'];
@@ -65,22 +65,16 @@
           settings = JSON.parse(settings);
         }
 
-        console.log(settings['shuffle']);
-        console.log(settings['repeat']);
-
-        var select = document.getElementById("optionShuffle");
-        for (var i = 0; i < select.children.length; i++) {
-          var child = select.children[i];
-          if (child.value == settings['shuffle']) {
-            child.selected = "true";
-            break;
-          }
-        }
+        var cbShuffle = document.getElementById("optionShuffle");
+        cbShuffle.checked = settings['shuffle'];
         
-        var select = document.getElementById("optionRepeat");
+        var cbRepeat = document.getElementById("optionRepeat");
+        cbRepeat.checked = settings['repeat'];
+
+        var select = document.getElementById("optionMP3Player");
         for (var i = 0; i < select.children.length; i++) {
           var child = select.children[i];
-          if (child.value == settings['repeat']) {
+          if (child.value == settings['mp3player']) {
             child.selected = "true";
             break;
           }
@@ -107,7 +101,9 @@
         if (itemValue == undefined) {
           itemValue = "";
         }
-        var garbageTruck = document.getElementById('list'+whichList);
+        var listDiv = document.getElementById('list'+whichList);
+        var listAdd = document.getElementById('list'+whichList+'Add');
+
         garbageInput = document.createElement('input');
         garbageInput.value = itemValue;
         garbageInput.name = 'option'+whichList;
@@ -117,9 +113,9 @@
         garbageAdd.setAttribute('onclick', 'removeInput(\'option'+whichList+document.getElementsByTagName('input').length+'\'); return false;');
         garbageAdd.innerHTML = '<img src="x_7x7.png" />&nbsp;';
         garbageLinebreak = document.createElement('br');
-        garbageTruck.appendChild(garbageAdd);
-        garbageTruck.appendChild(garbageInput);
-        garbageTruck.appendChild(garbageLinebreak);
+        listDiv.insertBefore(garbageAdd,listAdd);
+        listDiv.insertBefore(garbageInput,listAdd);
+        listDiv.insertBefore(garbageLinebreak,listAdd);
       }
 
       function removeInput(garbageWhich) {
@@ -132,10 +128,14 @@
       function saveOptions() {
         var settings = {};
 
-        var selectShuffle = document.getElementById('optionShuffle');
-        settings['shuffle'] = selectShuffle.children[selectShuffle.selectedIndex].value;
-        var selectRepeat = document.getElementById('optionRepeat');
-        settings['repeat'] = selectRepeat.children[selectRepeat.selectedIndex].value;
+        var cbShuffle = document.getElementById('optionShuffle');
+        settings['shuffle'] = cbShuffle.checked;
+        
+        var cbRepeat = document.getElementById('optionRepeat');
+        settings['repeat'] = cbRepeat.checked;
+        
+        var selectMP3Player = document.getElementById('optionMP3Player');
+        settings['mp3player'] = selectMP3Player.children[selectMP3Player.selectedIndex].value;
 
         settings['listWhite'] = [];
         settings['listBlack'] = [];
@@ -170,31 +170,29 @@
     </div>
     <img src="content_top.png?alpha" alt="" id="content_top">
     <div id="content">
-      <label for="optionShuffle">Shuffle: </label>
-      <select id="optionShuffle" name="optionShuffle">
-        <option value="false">Off</option>
-        <option value="true">On</option>
-      </select>
-      <label for="optionRepeat">Repeat: </label>
-      <select id="optionRepeat" name="optionRepeat">
-        <option value="false">Off</option>
-        <option value="true">On</option>
-      </select>
-      <br />
+      <input type="checkbox" id="optionShuffle" name="optionShuffle" />
+      <label for="optionShuffle"> Shuffle</label><br />
+      <input type="checkbox" id="optionRepeat" name="optionRepeat" />
+      <label for="optionRepeat"> Repeat</label><br /><br />
+      <label for="optionMP3Player">MP3 Player Method: </label>
+      <select id="optionMP3Player" name="optionMP3Player" />
+        <option value="flash">Flash</option>
+        <option value="html5">HTML5</option>
+      </select><br />
       <div id="listBlack">
         <h2>Black List</h2>
         <p>Do not add music with these words:</p>
-        <a href="#" onclick="addInput('Black'); return false;">add</a><br />
+        <a href="#" onclick="addInput('Black'); return false;" id="listBlackAdd">add</a><br />
       </div>
       <div id="listWhite">
         <h2>White List</h2>
         <p>Always add music with these words:</p>
-        <a href="#" onclick="addInput('White'); return false;">add</a><br />
+        <a href="#" onclick="addInput('White'); return false;" id="listWhiteAdd">add</a><br />
       </div>
       <div id="listSites">
         <h2>Site List</h2>
         <p>Run ChromeTaster on these sites:</p>
-        <a href="#" onclick="addInput('Sites'); return false;">add</a><br />
+        <a href="#" onclick="addInput('Sites'); return false;" id="listSitesAdd">add</a><br />
       </div>
       <br />
       <input onclick="saveOptions()" type="button" value="Save" />&nbsp;&nbsp;

@@ -1,8 +1,14 @@
 <html>
-<script type="text/javascript" src="soundmanager2.js"></script>
 <script type="text/javascript">
   var playlist = new Array();
   var nowplaying = null;
+
+	var defaultSettings = { 'shuffle': false, 'repeat': true, 'mp3player': 'flash', 'listBlack': ['beatles'], 'listWhite': ['bjorn', 'beck'], 'listSites': ['http://*.tumblr.com/*', 'http://bjornstar.com/*'] }; //initialize default values.
+  if (localStorage["settings"] == undefined) {
+    settings = defaultSettings;
+  } else {
+    settings = JSON.parse(localStorage["settings"]);
+  }
 
   chrome.extension.onRequest.addListener( // Yes, this is ugly, I know. I'll fix it later.
     function(song, sender, sendResponse) {
@@ -35,15 +41,15 @@
       }
     }
 
-    if (localStorage["shuffle"]) {
+    if (settings["shuffle"]) {
       var s = Math.floor(Math.random()*soundManager.soundIDs.length+1);
       next_song = soundManager.soundIDs[s];
     }
     
-    if (localStorage["repeat"] && bad_idea == previous_song) {
+    if (settings["repeat"] && bad_idea == previous_song) {
       next_song = first_song;
     }
-    
+
     if (next_song != null) {
       var soundNext = soundManager.getSoundById(next_song);
       soundNext.play();
@@ -55,7 +61,14 @@
     var mySoundObject = soundManager.getSoundById(soundManager.soundIDs[x]);
     mySoundObject.play();
 	}
-		
+
+  if (localStorage["mp3player"]=="flash") {
+    var fileref=document.createElement('script');
+    fileref.setAttribute("type","text/javascript");
+    fileref.setAttribute("src", "soundmanager2.js");
+    document.getElementsByTagName("head")[0].appendChild(fileref);
+  }
+
 </script>
 <h1>ChromeTaster</h1>
 </html>

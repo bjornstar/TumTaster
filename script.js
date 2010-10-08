@@ -21,7 +21,7 @@ var last_embed = 0;
 var song_embed = document.getElementsByTagName('embed');
 
 function loadSettings() {
-	var defaultSettings = { 'shuffle': 'false', 'repeat': 'true', 'listBlack': ['beatles'], 'listWhite': ['bjorn', 'beck'], 'listSites': ['http://*.tumblr.com/*', 'http://bjornstar.com/*'] }; //initialize default values.
+	var defaultSettings = { 'shuffle': false, 'repeat': true, 'mp3player': 'flash', 'listBlack': ['beatles'], 'listWhite': ['bjorn', 'beck'], 'listSites': ['http://*.tumblr.com/*', 'http://bjornstar.com/*'] }; //initialize default values.
 	chrome.extension.sendRequest('getSettings', function(response) {
 		savedSettings = response.settings;
 		if (savedSettings == undefined) {
@@ -63,6 +63,9 @@ function taste() {
 				song_color = 'FFFFFF';
 			}
 
+      var post_id = song_url.match(/audio_file\/(\d*)\//)[1];
+      var post_url = 'http://www.tumblr.com/';
+
 			var dl_a = document.createElement('a');
 			dl_a.setAttribute('href', song_url);
 			dl_a.setAttribute('style', 'background-color: #'+song_bgcolor+'; color: #'+song_color+'; text-decoration: none;');
@@ -75,10 +78,7 @@ function taste() {
       dl_span.appendChild(dl_a);
 
 			song_embed[i].parentNode.appendChild(dl_span);
-      song_embed[i].parentNode.style.height='54px';
-
-      var post_id = song_url.match(/audio_file\/(\d*)\//)[1];
-      var post_url = 'http://www.tumblr.com/';
+      guaranteeheight(song_embed[i],54);
 
 			// Find the post's URL.
 			var anchors = document.getElementsByTagName('a');
@@ -90,6 +90,11 @@ function taste() {
 				}
 			}
 
+      //Remove # anchors...
+			if (post_url.indexOf('#')>=0) {
+        post_url = post_url.substring(0,post_url.indexOf('#'));
+      }
+
 			if (window.location.href.substring(0,28)!='http://www.tumblr.com/reblog') { //If you're reblogging it don't add it to the playlist, it's already there.
 
 				//We check our white list to see if we should add it to the playlist.
@@ -99,7 +104,7 @@ function taste() {
 				//Only do contextual white list and black list on the dashboard, maybe I can come up with a universal way to do it in a later revision.
 				
 				if (window.location.href.substring(0,31)=='http://www.tumblr.com/dashboard' || window.location.href.substring(0,36)=='http://www.tumblr.com/show/audio/by/') {
-					var post = document.getElementById('post'+post_id);
+					var post = document.getElementById('post_'+post_id);
 					
 					for (itemWhite in settings['listWhite']) {
 						if (post.innerHTML.toLowerCase().indexOf(settings['listWhite'][itemWhite].toLowerCase()) >= 0) {
@@ -118,7 +123,6 @@ function taste() {
 						}
 					}
 				}
-				
 				if (!blacklisted) {
 					chrome.extension.sendRequest({song_url: song_url, post_id: post_id, post_url: post_url});
 				}
@@ -126,6 +130,15 @@ function taste() {
 		}
 	}
 	last_embed = song_embed.length;
+}
+
+function guaranteeheight(start_here,at_least) {
+  while(start_here.parentNode!=undefined||start_here.parentNode!=start_here.parentNode) {
+    if(start_here.parentNode.offsetHeight<at_least) {
+      start_here.parentNode.style.height=at_least+'px';
+    }
+    start_here=start_here.parentNode;
+  }
 }
 
 function fixaudiopagination() {

@@ -1,4 +1,4 @@
-ChromeTaster v0.4.1
+ChromeTaster v0.4.2
 By Bjorn Stromberg
 
 This is a Chrome extension that slurps up all the links to MP3s that you see and queues them up for playback. It's built on top of a greasemonkey script that I wrote called TumTaster that creates download links for MP3s on Tumblr.
