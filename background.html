@@ -62,7 +62,7 @@
     mySoundObject.play();
 	}
 
-  if (localStorage["mp3player"]=="flash") {
+  if (settings["mp3player"]=="flash") {
     var fileref=document.createElement('script');
     fileref.setAttribute("type","text/javascript");
     fileref.setAttribute("src", "soundmanager2.js");
