@@ -1,22 +1,22 @@
 {
-  "name": "ChromeTaster",
-  "version": "0.4.3",
-  "description": "A Chrome extension that keeps track of the MP3s you see and queues them up for playback. (Currently only works on Tumblr)",
+  "name": "TumTaster",
+  "version": "0.4.4",
+  "description": "An extension that creates download links for the MP3s you see on Tumblr.",
   "browser_action": {
-    "default_icon": "tumblr-audio-icon-16.png",
-    "default_title": "ChromeTaster",
+    "default_icon": "Icon-16.png",
+    "default_title": "TumTaster",
     "popup": "popup.html"
   },
   "icons": { 
-    "16": "tumblr-audio-icon-16.png",
-    "32": "tumblr-audio-icon-32.png",
-    "48": "tumblr-audio-icon-48.png",
-    "64": "tumblr-audio-icon-64.png"
+    "16": "Icon-16.png",
+    "32": "Icon-32.png",
+    "48": "Icon-48.png",
+    "64": "Icon-64.png"
   },
   "background_page": "background.html",
   "options_page"	: "options.html",
   "content_scripts": [ {
-    "js": [ "script.js" ],
+    "js": [ "/includes/script.js" ],
     "matches": [ "http://*/*", "https://*/*" ]
   } ]
 }

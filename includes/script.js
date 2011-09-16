@@ -10,12 +10,6 @@ function addGlobalStyle(css) {
 var tumblr_ico = 'data:image/gif;base64,R0lGODlhEAAQAOZuAD9cdyA3TT5bdkBdeCA3Tj1adTZSbCI6VEFeeUtphDhVb0VjfiM7UjdTbiE4T0dlgEhmgjxYc0lnglZfajRQazlVcENgezpWcbrAxzxZdDtYcyM6UT5adSQ7UkRhfDNPaUhlgUJgezlWcDdUbsDJ1FBpgSI5UCE5UL3EzlZtgz1ZdOHh5UFfepadpt/i6Ofo7cDI0is8TVljbjtXcj9JVi8/UTZSbbS6w3CHnTdTbThUbkVifTpXckdlgUlmgkdkgEpngzZTbSs6Sr/I0TpXcV9wgkZkf2V6j0JfejRJXjNMYzhPZUBbdDtYckFbc46hsuHm7D1YcWZ/lkRifUZkgCI6UUpogzVJXrvEzkhmgThUb4WZrOHl7EVifqu0v72/xba9xipDYENhfEZjf0lngyg0QkpohDRQajVRax82TUtphd/f4+vu8yg/WP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAG4ALAAAAAAQABAAAAfYgG5tg4SFhYIHZooJao2OjWEdbT4SZJZQbE6KZoxqkg8PPSBbbGxllZZAVgxtCwtjT1ylMjhSIFkQEKxiHh6lv2wwTEZUPxttCCxIQy6lGBgtNVM7XccAAANRKKVlSVdLIRYWVW0FBRwCJGwvZdgDAwgIJm1NGhERWCtrZecC/gAn2lQQceECmDVrJmg4UiJDBhUO2jQYoUOLF4QYixDhMSOigY82UtzA+IWGAgUVCLQ5QwGNSyUxJpQpIyRIjgYqD3z4cKZnz5Yu0Rwg4CaN0aNIAygN4CYQADs=';
 var tumtaster_style = 'background-image:url('+tumblr_ico+'); background-repeat:no-repeat; background-position: 6px 5px; line-height:27px; height:27px; width:207px; vertical-align:middle; font-size:10px; display:block !important; text-align:right; margin-top:1px; font-family:helvetica,arial,sans-serif; text-decoration:none; color:#000000; float:left;';
 
-try {
-  document.styleSheets[0].insertRule('a.tumtaster {'+tumtaster_style+'}', 0);
-} catch (e) {
-  addGlobalStyle('a.tumtaster {'+tumtaster_style+'}');
-}
-
 var settings;
 var last_embed = 0;
 var song_embed = document.getElementsByTagName('embed');
@@ -33,6 +27,11 @@ function loadSettings() {
       fixaudiopagination();
 		}
 		if (checkurl(location.href, settings['listSites'])) {
+      try {
+        document.styleSheets[0].insertRule('a.tumtaster {'+tumtaster_style+'}', 0);
+      } catch (e) {
+        addGlobalStyle('a.tumtaster {'+tumtaster_style+'}');
+      }
 			setInterval(taste, 200);
     }
 	});
@@ -54,11 +53,14 @@ function taste() {
 	for (var i=last_embed;i<song_embed.length;i++) {
 		if (song_embed[i].getAttribute('src').indexOf('/swf/audio_player') >= 0) {
 			var song_url = song_embed[i].getAttribute('src').substring(song_embed[i].getAttribute('src').indexOf('audio_file=')+11);
+      song_url = song_url.replace('&logo=soundcloud','');
+
 			var song_bgcolor = song_url.substring(song_url.length-6);
 			var song_color = '777777';
+			
 			song_url = song_url.replace('&color='+song_bgcolor,'?plead=please-dont-download-this-or-our-lawyers-wont-let-us-host-audio');
-
-			if (song_embed[i].getAttribute('src').indexOf('audio_player_black') >= 0) {
+			
+      if (song_embed[i].getAttribute('src').indexOf('audio_player_black') >= 0) {
 				song_bgcolor = '000000';
 				song_color = 'FFFFFF';
 			}
@@ -78,7 +80,7 @@ function taste() {
       dl_span.appendChild(dl_a);
 
 			song_embed[i].parentNode.appendChild(dl_span);
-      guaranteeheight(song_embed[i],54);
+      guaranteesize(song_embed[i],54,0);
 
 			// Find the post's URL.
 			var anchors = document.getElementsByTagName('a');
@@ -132,10 +134,13 @@ function taste() {
 	last_embed = song_embed.length;
 }
 
-function guaranteeheight(start_here,at_least) {
+function guaranteesize(start_here,at_least_height,at_least_width) {
   while(start_here.parentNode!=undefined||start_here.parentNode!=start_here.parentNode) {
-    if(start_here.parentNode.offsetHeight<at_least) {
-      start_here.parentNode.style.height=at_least+'px';
+    if(start_here.parentNode.offsetHeight<at_least_height&&start_here.parentNode.className!="post_content"&&start_here.parentNode.style.getPropertyValue('display')!='none') {
+      start_here.parentNode.style.height=at_least_height+'px';
+    }
+    if(start_here.parentNode.offsetWidth<at_least_width&&start_here.parentNode.className!="post_content"&&start_here.parentNode.style.getPropertyValue('display')!='none') {
+      start_here.parentNode.style.width=at_least_width+'px';
     }
     start_here=start_here.parentNode;
   }
@@ -152,6 +157,7 @@ function fixaudiopagination() {
   } else {
     nextpagelink.href = currentpage.substring(0,currentpage.lastIndexOf('/')+1)+(pagenumber+1);
   }
+
   if (prevpagelink) {
     prevpagelink.href = currentpage.substring(0,currentpage.lastIndexOf('/')+1)+(pagenumber-1);
   }
@@ -162,6 +168,7 @@ function fixaudiopagination() {
     dashboard_controls.children[1].children[0].href = currentpage.substring(0,currentpage.lastIndexOf('/')+1)+(pagenumber-1);
     dashboard_controls.children[1].children[2].href = currentpage.substring(0,currentpage.lastIndexOf('/')+1)+(pagenumber+1);
   }
+  
 }
 
 loadSettings();

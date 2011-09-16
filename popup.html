@@ -120,47 +120,49 @@
 	#controls{
 		text-align:center;
 	}
-#statusbar{
-position:relative;
-height:12px;
-background-color:#CDD568;
-border:2px solid #eaf839;
-border-radius:2px;
--moz-border-radius:2px;
--webkit-border-radius:2px;
-overflow:hidden;
-margin-top:4px;
-}
+  #statusbar{
+    position:relative;
+    height:12px;
+    background-color:#CDD568;
+    border:2px solid #eaf839;
+    border-radius:2px;
+    -moz-border-radius:2px;
+    -webkit-border-radius:2px;
+    overflow:hidden;
+    margin-top:4px;
+  }
 
-.remove{
-position:absolute;
-right:8px;
-top:8px;
-}
+  .remove{
+    position:absolute;
+    right:8px;
+    top:8px;
+  }
 
-.position, .position2, .loading{
-position:absolute;
-left:0px;
-bottom:0px;
-height:12px;
-}
-.position{
-background-color: #3B440F;
-border-right:2px solid #3B440F;
-border-radius:2px;
--moz-border-radius:2px;
--webkit-border-radius:2px;
-}
-.position2{
-background-color:#eaf839;
-}
-.loading {
-background-color:#BBC552;
-}
+  .position, .position2, .loading{
+    position:absolute;
+    left:0px;
+    bottom:0px;
+    height:12px;
+  }
 
+  .position{
+    background-color: #3B440F;
+    border-right:2px solid #3B440F;
+    border-radius:2px;
+    -moz-border-radius:2px;
+    -webkit-border-radius:2px;
+    width:20px;
+  }
 
+  .position2{
+    background-color:#eaf839;
+  }
+  
+  .loading {
+    background-color:#BBC552;
+  }
 </style>
-<div id="heading" style="width:100%;height:64px;"><img src="tumblr-audio-icon-64.png" style="float:left;" /><h1>ChromeTaster</h1></div>
+<div id="heading" style="width:100%;height:64px;"><img src="Icon-64.png" style="float:left;" /><h1>TumTaster</h1></div>
 <div id="statistics"><span> </span></div>
 <div id="nowplayingdiv"><span id="nowplaying">Now Playing: </span>
 <div id="statusbar">
@@ -170,16 +172,26 @@ background-color:#BBC552;
 </div>
 </div>
 
-<p id="controls"><a href="javascript:void(sm.stopAll())">&#x25A0;</a>&nbsp;&nbsp;<a href="javascript:void(pause())">&#x2759; &#x2759;</a>&nbsp;&nbsp;<a href="javascript:void(sm.resumeAll())">&#x25b6;</a>&nbsp;&nbsp;<a href="javascript:void(playnextsong())">&#x25b6;&#x25b6;</a>&nbsp;&nbsp;<a href="javascript:void(playrandomsong())">Random</a></p>
+<p id="controls">
+<a href="javascript:void(sm.stopAll())">&#x25A0;</a>&nbsp;&nbsp;
+<a href="javascript:void(pause())">&#x2759; &#x2759;</a>&nbsp;&nbsp;<a href="javascript:void(sm.resumeAll())">&#x25b6;</a>&nbsp;&nbsp;<a href="javascript:void(playnextsong())">&#x25b6;&#x25b6;</a>&nbsp;&nbsp;<a href="javascript:void(playrandomsong())">Random</a></p>
 <script type="text/javascript">
 var bg = chrome.extension.getBackgroundPage();
 var sm = bg.soundManager;
-var pl = sm.sounds;
 
 function remove(song_id) {
-	sm.destroySound(song_id);
-	var song_li = document.getElementById(song_id);
-	song_li.parentNode.removeChild(song_li);
+  switch (bg.settings["mp3player"]) {
+    case "flash":
+      sm.destroySound(song_id);
+      var song_li = document.getElementById(song_id);
+      song_li.parentNode.removeChild(song_li);
+      break;
+    case "html5":
+      bg.removeSong(song_id);
+      var song_li = document.getElementById(song_id);
+      song_li.parentNode.removeChild(song_li);
+      break;
+  }
 }
 
 function pause() {
@@ -188,19 +200,39 @@ function pause() {
 }
 
 function play(song_url,post_url) {
-  sm.stopAll();
-  var mySoundObject = sm.getSoundById(post_url);
-  mySoundObject.play();
-  update_nowplaying();
+  switch (bg.settings["mp3player"]) {
+    case "flash":
+      sm.stopAll();
+      var mySoundObject = sm.getSoundById(post_url);
+      mySoundObject.play();
+      update_nowplaying();
+      break;
+    case "html5":
+      bg.playSong(song_url,post_url);
+      update_nowplaying();
+      break;
+  }
 }
 
 function get_currentsong() {
   var song_nowplaying = null;
-	for (sound in sm.sounds) {
-		if (sm.sounds[sound].playState == 1 && !song_nowplaying) {
-			song_nowplaying = sm.sounds[sound];
-		}
-	}
+  switch (bg.settings["mp3player"]){
+    case "flash":
+      for (sound in sm.sounds) {
+        if (sm.sounds[sound].playState == 1 && !song_nowplaying) {
+          song_nowplaying = sm.sounds[sound];
+        }
+      }
+      break;
+    case "html5":
+      var pl = bg.getJukebox();
+      for (var x=0;x<pl.length;x++) {
+        if (pl[x].currentTime<pl[x].duration && pl[x].currentTime>0 && !pl[x].paused) {
+          song_nowplaying = pl[x];
+        }
+      }
+      break;
+  }
 	return song_nowplaying;
 }
 
@@ -208,7 +240,7 @@ function update_nowplaying() {
   var current_song = get_currentsong();
   if (current_song) {
 		var nowplaying = document.getElementById('nowplaying');
-		nowplaying.innerHTML = 'Now Playing: '+current_song.sID;
+		nowplaying.innerHTML = 'Now Playing: '+current_song.id;
 	}
 }
 
@@ -241,13 +273,32 @@ function playrandomsong() {
 	update_nowplaying();
 }
 
-update_nowplaying();
-update_statistics();
-
 document.write('<ol class="playlist">');
-for (x in pl) {
-  document.write('<li id="'+pl[x].sID+'"><a href="javascript:void(play(\''+pl[x].url+'\',\''+pl[x].sID+'\'))">'+pl[x].sID+'</a><a class="remove" href="javascript:void(remove(\''+pl[x].sID+'\'))"><img src="x_7x7.png" /></a></li>\r\n');
+
+var PNGremove = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAGFJREFUeNpiXLVmfTwDA8MEIHYICwm8COTrA9kHgLiAEch5D2QIAPEHkABUIZjPBNIBlQAJLEBS6MAEMgqqAxkUgMQZkewQQJKE6ESSAAkkIFlxgAlq5AeoaxciuaEAIMAAiDAi7M96B5wAAAAASUVORK5CYII=';
+
+switch (bg.settings["mp3player"]) {
+  case "flash":
+    var pl = sm.sounds;
+    for (x in pl) {
+      document.write('<li id="'+pl[x].sID+'">');
+      document.write('<a href="javascript:void(play(\''+pl[x].url+'\',\''+pl[x].sID+'\'))">'+pl[x].sID+'</a>');
+      document.write('<a class="remove" href="javascript:void(remove(\''+pl[x].sID+'\'))"><img src="'+PNGremove+'" /></a></li>\r\n');
+    }
+    document.write('</ol>');
+    break;
+  case "html5":
+    var pl = bg.getJukebox();
+    for (x in pl) {
+      if (pl[x].id!=undefined) {
+        document.write('<li id="'+pl[x].id+'">');
+        document.write('<a href="javascript:void(play(\''+pl[x].src+'\',\''+pl[x].id+'\'))">'+pl[x].id+'</a>');
+        document.write('<a class="remove" href="javascript:void(remove(\''+pl[x].id+'\'))"><img src="'+PNGremove+'" /></a></li>\r\n');
+      }
+    }
+    break;
 }
+
 document.write('</ol>');
 
 var div_loading = document.getElementById('loading');
@@ -257,17 +308,24 @@ var div_position2 = document.getElementById('position2');
 function updateStatus() {
 	var current_song = get_currentsong();
 	if (current_song != undefined) {
-		if (current_song.bytesTotal > 0) {
-			div_loading.style.width = (100 * current_song.bytesLoaded / current_song.bytesTotal) + '%';
-		}
-		div_position.style.width = "20px";
-		div_position.style.left = (100 * current_song.position / current_song.durationEstimate) + '%';
-		div_position2.style.width = (100 * current_song.position / current_song.durationEstimate) + '%';
+    switch(bg.settings["mp3player"]) {
+      case "flash":
+        if (current_song.bytesTotal > 0) {
+          div_loading.style.width = (100 * current_song.bytesLoaded / current_song.bytesTotal) + '%';
+        }
+        div_position.style.left = (100 * current_song.position / current_song.durationEstimate) + '%';
+        div_position2.style.width = (100 * current_song.position / current_song.durationEstimate) + '%';
+        break;
+      case "html5":
+        div_position.style.left = (100 * current_song.currentTime / current_song.duration) + '%';
+        div_position2.style.width = (100 * current_song.currentTime / current_song.duration) + '%';
+        break;
+    }
 	}
 }
 
 setInterval(updateStatus, 200);
 
-
+update_nowplaying();
 </script>
 </html>
