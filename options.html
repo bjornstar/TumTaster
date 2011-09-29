@@ -6,21 +6,28 @@
         color:black;
         font-family:arial,helvetica,sans-serif;
         margin:0;
-        padding:0 10px;
+        padding:10px 30px 30px 10px;
         background-color:#2C4762;
         background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAARHCAIAAAC9OZ68AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAc9JREFUeNrsVlF2wzAIQzvXLrKD7PyqYwMWdry+fi8fvDYuAQESrn3//H6Z2RtjM5QztjPEGZshPil+SD/aOB/vSDx6LPg5Iz7amclz4BBcyzthSP+DBV6NSfhZYGOPAa3N41642P3Zc/Vz7nnyN4sYvMEn/VhyjV5i5Lzw0GMWH+8x95r3PrDmKz3d59Kfrx5fuDH7ljgcS/QpejPqDNzuj4ml+3ptOM3WIi+yb1nv1sfJRWbfWWrvHPSeDSysfCjzEDzBkzssztOVT6O+4BRvcsze7dpB8c2eBc993rb0dNehzNAGtyeulQdMrdZaFi7pb5LjVm9XLRR9ouJkwTN5zVUDkRuhcxRenrWOyqklJ0LP/XvjSosHzhmmb/Js1Ysd+COaMJlrzE60XeOrZid2tB4SPO8x0a/qj7Jre7yeD6IXK3pRvMRhX/LmPsg5L99jf0Zturus8hvCD3q/Bt+w+P+hJVs1E7uFdYfnvnIO5V0me0x33hWHdZfEe1VHdtytlQvrfSH3KKrmw3/0gkVvYw/s/Kqc0Lkh61TMdV9i7vV4zr0XvdN+Dm5CPiNfnvvdzpu7r2gX9vk9/thjjz322GOfGN7/h3js39tLgAEA5+M4ca0bVE0AAAAASUVORK5CYII=);
         background-repeat:repeat-x;
         color:#4F545A;
+        width:640px;
       }
       h1{
         color:black;
+      }
+      h2{
+        margin:0;
+      }
+      p{
+        margin:0;
       }
       a{
         color:#4F545A;
         text-decoration:none;
       }
       #content{
-        background-color:#FFFFFF;
+        background: white;
         display: block;
         margin: 0px;
         outline-color: #444;
@@ -30,33 +37,39 @@
         padding-left: 30px;
         padding-right: 30px;
         padding-top: 5px;
-        width: 840px;
+        width: 570px;
         -webkit-border-radius: 10px;
         -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, .46);
       }
-      #content_top,#content_bottom{
-        display: inline;
-        height: 25px;
-        outline-color: #444;
-        outline-style: none;
-        outline-width: 0px;
-        width: 900px;
+      #repeat_div,#player_div{
+        margin-bottom:25px;
       }
       #listBlack,#listWhite{
         float:left;
-        width:300px;
+        width:240px;
         margin-bottom:25px;
       }
       #listSites{
         clear:left;
-        width:800px;
+        width:540px;
       }
       #listSites input{
         width:400px;
       }
+      #version_div{
+        color:#A8B1BA;
+        font: 11px 'Lucida Grande',Verdana,sans-serif;
+        text-align:right;
+      }
+      #browser_span{
+        color:#A8B1BA;
+        font: 11px 'Lucida Grande',Verdana,sans-serif;
+        vertical-align:top;
+      }
     </style>
     <script type="text/javascript">
-      var defaultSettings = { 'version': '0.4.4', 'shuffle': false, 'repeat': true, 'mp3player': 'flash', 'listBlack': ['beatles'], 'listWhite': ['bjorn', 'beck'], 'listSites': ['http://*.tumblr.com/*', 'http://bjornstar.com/*'] }; //initialize default values.
+      var defaultSettings = { 'version': '0.4.5', 'shuffle': false, 'repeat': true, 'mp3player': 'flash', 'listBlack': ['beatles'], 'listWhite': ['bjorn', 'beck'], 'listSites': ['http://*.tumblr.com/*', 'http://bjornstar.com/*'] }; //initialize default values.
+      var browser;
 
       function loadOptions() {
         var settings = localStorage['settings'];
@@ -97,6 +110,24 @@
         addInput("Black"); //prepare a blank input box.
         addInput("White"); //prepare a blank input box.
         addInput("Sites"); //prepare a blank input box.
+
+        var version_div = document.getElementById('version_div');
+        version_div.innerHTML = 'v'+defaultSettings['version']; //use default so we're always showing current version regardless of what people have saved.
+
+        if (typeof opera != 'undefined') {
+          var browser_span = document.getElementById('browser_span');
+          browser_span.innerHTML = "for Opera&trade;";
+        }
+        
+        if (typeof chrome != 'undefined') {
+          var browser_span = document.getElementById('browser_span');
+          browser_span.innerHTML = "for Chrome&trade;";          
+        }
+        
+        if (typeof safari != 'undefined') {
+          var browser_span = document.getElementById('browser_span');
+          browser_span.innerHTML = "for Safari&trade;";
+        }
       }
 
       function addInput(whichList, itemValue) {
@@ -169,19 +200,22 @@
   </head>
   <body onload="loadOptions()">
     <div id="content">
-      <div style="width:100%;height:64px;margin-bottom:12px;">
-        <img src="Icon-64.png" style="float:left;padding-right:10px;" />
-        <h1 style="line-height:64px;">TumTaster Options</h1>
+      <img style="float:left;" src="Icon-64.png">
+      <h1 style="line-height:32px;height:32px;margin-top:16px;">TumTaster Options <span id="browser_span"> </span></h1>
+      
+      <div id="shuffle_div">
+        <input type="checkbox" id="optionShuffle" name="optionShuffle" /> <label for="optionShuffle"> Shuffle</label>
       </div>
-      <input type="checkbox" id="optionShuffle" name="optionShuffle" />
-      <label for="optionShuffle"> Shuffle</label><br />
-      <input type="checkbox" id="optionRepeat" name="optionRepeat" />
-      <label for="optionRepeat"> Repeat</label><br /><br />
-      <label for="optionMP3Player">MP3 Player Method: </label>
-      <select id="optionMP3Player" name="optionMP3Player" />
-        <option value="flash">Flash</option>
-        <option value="html5">HTML5</option>
-      </select><br />
+      <div id="repeat_div">
+        <input type="checkbox" id="optionRepeat" name="optionRepeat" /> <label for="optionRepeat"> Repeat</label>
+      </div>
+      <div id="player_div">
+        <label for="optionMP3Player">MP3 Player Method: </label>
+        <select id="optionMP3Player" name="optionMP3Player" />
+          <option value="flash">Flash</option>
+          <option value="html5">HTML5</option>
+        </select>
+      </div>
       <div id="listBlack">
         <h2>Black List</h2>
         <p>Do not add music with these words:</p>
@@ -199,7 +233,8 @@
       </div>
       <br />
       <input onclick="saveOptions()" type="button" value="Save" />&nbsp;&nbsp;
-      <input onclick="eraseOptions()" type="button" value="Restore default" />
+      <input onclick="if (confirm('Are you sure you want to restore defaults?')) {eraseOptions();};" type="button" value="Restore default" />
+      <div id="version_div"> </div>
     </div>
   </body>
 </html>

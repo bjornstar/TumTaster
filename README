@@ -1,16 +1,18 @@
-ChromeTaster v0.4.3
-By Bjorn Stromberg
+TumTaster v0.4.5
+By Bjorn Stromberg (@bjornstar)
 
-This is a Chrome extension that slurps up all the links to MP3s that you see and queues them up for playback. It's built on top of a greasemonkey script that I wrote called TumTaster that creates download links for MP3s on Tumblr.
+This is an extension for Google Chrome that slurps up all the links to MP3s that you see and queues them up for playback. It's built on top of a greasemonkey script that I wrote called TumTaster that creates download links for MP3s on Tumblr.
+
+v0.4.5 Renamed the extension to TumTaster because Google suddenly decided they didn't like the old name and took down ChromeTaster.
 
 v0.3 Now has blacklists and whitelists so that you can prevent some songs from getting put onto your playlist. You can put in a username, artist, or song name. It will do partial matches, so be careful what you put in there.
 
-IMPORTANT: To get MP3 playback to work you must add this extension to the flash allow list. You must visit this page - http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html and add the following line:
+IMPORTANT: To get MP3 playback in flash to work you must add this extension to the flash allow list. You must visit this page - http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html and add the following line:
 
-chrome-extension:\\igkglbhdogeemdmnfdjgapgacfhgiikd\
+chrome-extension:\\nanfbkacbckngfcklahdgfagjlghfbgm\
 
-I have tried Chrome's HTML5 support, but found their player to be absolutely unusable due to the amateur hour 0.5 second buffer causing awful interaction delays. When they fix this I'll switch it over to HTML5, until then you must add this extension to your flash allow list.
+I am working on switching to an HTML5 player, but it's going to take some time. In the mean time, you must add this extension to your flash allow list. And yes, you must use backslashes.
 
 ChromeTaster uses SoundManager2 for it's MP3 playback. You can get more information about SoundManager2 at: http://www.schillmania.com/projects/soundmanager2
 
-
+TumTaster for Google Chrome can be installed here - https://chrome.google.com/webstore/detail/nanfbkacbckngfcklahdgfagjlghfbgm

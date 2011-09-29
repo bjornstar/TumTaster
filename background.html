@@ -3,7 +3,7 @@
 <script type="text/javascript">
   var nowplaying = null;
 
-	var defaultSettings = { 'version': '0.4.4', 'shuffle': false, 'repeat': true, 'mp3player': 'flash', 'listBlack': ['beatles'], 'listWhite': ['bjorn', 'beck'], 'listSites': ['http://*.tumblr.com/*', 'http://bjornstar.com/*'] }; //initialize default values.
+	var defaultSettings = { 'version': '0.4.5', 'shuffle': false, 'repeat': true, 'mp3player': 'flash', 'listBlack': ['beatles'], 'listWhite': ['bjorn', 'beck'], 'listSites': ['http://*.tumblr.com/*', 'http://bjornstar.com/*'] }; //initialize default values.
   if (localStorage["settings"] == undefined) {
     settings = defaultSettings;
   } else {
@@ -24,10 +24,10 @@
     switch (settings["mp3player"]) {
       case "flash":
         var mySoundObject = soundManager.createSound({
-          id: song.post_url,
-          url: song.song_url,
-          onloadfailed: function(){playnextsong(song.post_url)},
-          onfinish: function(){playnextsong(song.post_url)}
+          id: newSong.post_url,
+          url: newSong.song_url,
+          onloadfailed: function(){playnextsong(newSong.post_url)},
+          onfinish: function(){playnextsong(newSong.post_url)}
         });
         break;
       case "html5":
