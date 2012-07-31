@@ -52,10 +52,9 @@ function checkurl(url, filter) {
 function taste() {
 	for (var i=last_embed;i<song_embed.length;i++) {
 		if (song_embed[i].getAttribute('src').indexOf('/swf/audio_player') >= 0) {
-			var song_url = song_embed[i].getAttribute('src').substring(song_embed[i].getAttribute('src').indexOf('audio_file=')+11);
-      song_url = song_url.replace('&logo=soundcloud','');
+			var song_url = song_embed[i].getAttribute('src').substring(song_embed[i].getAttribute('src').indexOf('audio_file=')+11,song_embed[i].getAttribute('src').indexOf('&color=')+13);
 
-			var song_bgcolor = song_url.substring(song_url.length-6);
+			var song_bgcolor = song_url.substr(song_url.indexOf("&color=")+7,6);
 			var song_color = '777777';
 			
 			song_url = song_url.replace('&color='+song_bgcolor,'?plead=please-dont-download-this-or-our-lawyers-wont-let-us-host-audio');
@@ -65,7 +64,7 @@ function taste() {
 				song_color = 'FFFFFF';
 			}
 
-      var post_id = song_url.match(/audio_file\/(\d*)\//)[1];
+      var post_id = song_url.match(/audio_file\/([\w\-]+)\/(\d+)\//)[2];
       var post_url = 'http://www.tumblr.com/';
 
 			var dl_a = document.createElement('a');

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets"
+  version="0.4.7">
+	<name short="TumTaster">TumTaster for Opera</name>
+	<description>An extension that creates download links for the MP3s you see on Tumblr.</description>
+	<author href="http://bjornstar.com"
+    email="bjorn@bjornstar.com">Bjorn Stromberg (@bjornstar)</author>
+  <icon src="Icon-64.png"/>
+  <update-description href="http://tumtaster.bjornstar.com/tumtaster.xml"/>
+</widget>
