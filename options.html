@@ -67,138 +67,10 @@
         vertical-align:top;
       }
     </style>
-    <script type="text/javascript">
-      var defaultSettings = { 'version': '0.4.5', 'shuffle': false, 'repeat': true, 'mp3player': 'flash', 'listBlack': ['beatles'], 'listWhite': ['bjorn', 'beck'], 'listSites': ['http://*.tumblr.com/*', 'http://bjornstar.com/*'] }; //initialize default values.
-      var browser;
-
-      function loadOptions() {
-        var settings = localStorage['settings'];
-
-        if (settings == undefined) {
-          settings = defaultSettings;
-        } else {
-          settings = JSON.parse(settings);
-        }
-
-        var cbShuffle = document.getElementById("optionShuffle");
-        cbShuffle.checked = settings['shuffle'];
-        
-        var cbRepeat = document.getElementById("optionRepeat");
-        cbRepeat.checked = settings['repeat'];
-
-        var select = document.getElementById("optionMP3Player");
-        for (var i = 0; i < select.children.length; i++) {
-          var child = select.children[i];
-          if (child.value == settings['mp3player']) {
-            child.selected = "true";
-            break;
-          }
-        }
-        
-        for (var itemBlack in settings['listBlack']) {
-          addInput("Black", settings['listBlack'][itemBlack]);
-        }
-        
-        for (var itemWhite in settings['listWhite']) {
-          addInput("White", settings['listWhite'][itemWhite]);
-        }
-        
-        for (var itemSites in settings['listSites']) {
-          addInput("Sites", settings['listSites'][itemSites]);
-        }
-        
-        addInput("Black"); //prepare a blank input box.
-        addInput("White"); //prepare a blank input box.
-        addInput("Sites"); //prepare a blank input box.
-
-        var version_div = document.getElementById('version_div');
-        version_div.innerHTML = 'v'+defaultSettings['version']; //use default so we're always showing current version regardless of what people have saved.
-
-        if (typeof opera != 'undefined') {
-          var browser_span = document.getElementById('browser_span');
-          browser_span.innerHTML = "for Opera&trade;";
-        }
-        
-        if (typeof chrome != 'undefined') {
-          var browser_span = document.getElementById('browser_span');
-          browser_span.innerHTML = "for Chrome&trade;";          
-        }
-        
-        if (typeof safari != 'undefined') {
-          var browser_span = document.getElementById('browser_span');
-          browser_span.innerHTML = "for Safari&trade;";
-        }
-      }
-
-      function addInput(whichList, itemValue) {
-        if (itemValue == undefined) {
-          itemValue = "";
-        }
-
-        var PNGremove = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAGFJREFUeNpiXLVmfTwDA8MEIHYICwm8COTrA9kHgLiAEch5D2QIAPEHkABUIZjPBNIBlQAJLEBS6MAEMgqqAxkUgMQZkewQQJKE6ESSAAkkIFlxgAlq5AeoaxciuaEAIMAAiDAi7M96B5wAAAAASUVORK5CYII=';
-        var listDiv = document.getElementById('list'+whichList);
-        var listAdd = document.getElementById('list'+whichList+'Add');
-
-        garbageInput = document.createElement('input');
-        garbageInput.value = itemValue;
-        garbageInput.name = 'option'+whichList;
-        garbageInput.id = 'option'+whichList+document.getElementsByTagName('input').length;
-        garbageAdd = document.createElement('a');
-        garbageAdd.href = "#";
-        garbageAdd.setAttribute('onclick', 'removeInput(\'option'+whichList+document.getElementsByTagName('input').length+'\'); return false;');
-        garbageAdd.innerHTML = '<img src="'+PNGremove+'" />&nbsp;';
-        garbageLinebreak = document.createElement('br');
-        listDiv.insertBefore(garbageAdd,listAdd);
-        listDiv.insertBefore(garbageInput,listAdd);
-        listDiv.insertBefore(garbageLinebreak,listAdd);
-      }
-
-      function removeInput(garbageWhich) {
-        var garbageInput = document.getElementById(garbageWhich);
-        garbageInput.parentNode.removeChild(garbageInput.previousSibling);
-        garbageInput.parentNode.removeChild(garbageInput.nextSibling);
-        garbageInput.parentNode.removeChild(garbageInput);
-      }
-
-      function saveOptions() {
-        var settings = {};
-
-        var cbShuffle = document.getElementById('optionShuffle');
-        settings['shuffle'] = cbShuffle.checked;
-        
-        var cbRepeat = document.getElementById('optionRepeat');
-        settings['repeat'] = cbRepeat.checked;
-        
-        var selectMP3Player = document.getElementById('optionMP3Player');
-        settings['mp3player'] = selectMP3Player.children[selectMP3Player.selectedIndex].value;
-
-        settings['listWhite'] = [];
-        settings['listBlack'] = [];
-        settings['listSites'] = [];
-
-        var garbages = document.getElementsByTagName('input');
-        for (var i = 0; i< garbages.length; i++) {
-          if (garbages[i].value != "") {
-            if (garbages[i].name.substring(0,11) == "optionWhite") {
-              settings['listWhite'].push(garbages[i].value);
-            } else if (garbages[i].name.substring(0,11) == "optionBlack") {
-              settings['listBlack'].push(garbages[i].value);
-            } else if (garbages[i].name.substring(0,11) == "optionSites") {
-              settings['listSites'].push(garbages[i].value);
-            }
-          }
-        }
-        localStorage['settings'] = JSON.stringify(settings);
-        location.reload();
-      }
-
-      function eraseOptions() {
-        localStorage.removeItem('settings');
-        location.reload();
-      }
-    </script>
+    <script src="defaults.js" type="text/javascript"></script>
+    <script src="options.js" type="text/javascript"></script>
   </head>
-  <body onload="loadOptions()">
+  <body>
     <div id="content">
       <img style="float:left;" src="Icon-64.png">
       <h1 style="line-height:32px;height:32px;margin-top:16px;">TumTaster Options <span id="browser_span"> </span></h1>
@@ -219,21 +91,21 @@
       <div id="listBlack">
         <h2>Black List</h2>
         <p>Do not add music with these words:</p>
-        <a href="#" onclick="addInput('Black'); return false;" id="listBlackAdd">add</a><br />
+        <a href="#" id="listBlackAdd">add</a><br />
       </div>
       <div id="listWhite">
         <h2>White List</h2>
         <p>Always add music with these words:</p>
-        <a href="#" onclick="addInput('White'); return false;" id="listWhiteAdd">add</a><br />
+        <a href="#" id="listWhiteAdd">add</a><br />
       </div>
       <div id="listSites">
         <h2>Site List</h2>
         <p>Run ChromeTaster on these sites:</p>
-        <a href="#" onclick="addInput('Sites'); return false;" id="listSitesAdd">add</a><br />
+        <a href="#" id="listSitesAdd">add</a><br />
       </div>
       <br />
-      <input onclick="saveOptions()" type="button" value="Save" />&nbsp;&nbsp;
-      <input onclick="if (confirm('Are you sure you want to restore defaults?')) {eraseOptions();};" type="button" value="Restore default" />
+      <input id="save_btn" type="button" value="Save" />&nbsp;&nbsp;
+      <input id="reset_btn" type="button" value="Restore default" />
       <div id="version_div"> </div>
     </div>
   </body>

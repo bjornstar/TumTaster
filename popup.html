@@ -1,4 +1,5 @@
 <html>
+<head>
 <style type="text/css">
   html{
     color:black;
@@ -162,9 +163,12 @@
     background-color:#BBC552;
   }
 </style>
+<script src="popup.js" type="text/javascript"></script>
+</head>
+<body>
 <div id="heading" style="width:100%;height:64px;"><img src="Icon-64.png" style="float:left;" /><h1>TumTaster</h1></div>
 <div id="statistics"><span> </span></div>
-<div id="nowplayingdiv"><span id="nowplaying">Now Playing: </span>
+<div id="nowplayingdiv"><span>Now Playing: </span><span id="nowplaying"> </span>
 <div id="statusbar">
 <div id="loading" class="loading">&nbsp;</div>
 <div id="position2" class="position2">&nbsp;</div>
@@ -173,159 +177,14 @@
 </div>
 
 <p id="controls">
-<a href="javascript:void(sm.stopAll())">&#x25A0;</a>&nbsp;&nbsp;
-<a href="javascript:void(pause())">&#x2759; &#x2759;</a>&nbsp;&nbsp;<a href="javascript:void(sm.resumeAll())">&#x25b6;</a>&nbsp;&nbsp;<a href="javascript:void(playnextsong())">&#x25b6;&#x25b6;</a>&nbsp;&nbsp;<a href="javascript:void(playrandomsong())">Random</a></p>
-<script type="text/javascript">
-var bg = chrome.extension.getBackgroundPage();
-var sm = bg.soundManager;
+<a id="stop" href="#">&#x25A0;</a>&nbsp;&nbsp;
+<a id="pause" href="#">&#x2759; &#x2759;</a>&nbsp;&nbsp;
+<a id="play" href="#">&#x25b6;</a>&nbsp;&nbsp;
+<a id="next" href="#">&#x25b6;&#x25b6;</a>&nbsp;&nbsp;
+<a id="random" href="#">Random</a></p>
 
-function remove(song_id) {
-  switch (bg.settings["mp3player"]) {
-    case "flash":
-      sm.destroySound(song_id);
-      var song_li = document.getElementById(song_id);
-      song_li.parentNode.removeChild(song_li);
-      break;
-    case "html5":
-      bg.removeSong(song_id);
-      var song_li = document.getElementById(song_id);
-      song_li.parentNode.removeChild(song_li);
-      break;
-  }
-}
+<ol id="playlist" class="playlist">
+</ol>
 
-function pause() {
-  current_song = get_currentsong();
-  current_song.pause();
-}
-
-function play(song_url,post_url) {
-  switch (bg.settings["mp3player"]) {
-    case "flash":
-      sm.stopAll();
-      var mySoundObject = sm.getSoundById(post_url);
-      mySoundObject.play();
-      update_nowplaying();
-      break;
-    case "html5":
-      bg.playSong(song_url,post_url);
-      update_nowplaying();
-      break;
-  }
-}
-
-function get_currentsong() {
-  var song_nowplaying = null;
-  switch (bg.settings["mp3player"]){
-    case "flash":
-      for (sound in sm.sounds) {
-        if (sm.sounds[sound].playState == 1 && !song_nowplaying) {
-          song_nowplaying = sm.sounds[sound];
-        }
-      }
-      break;
-    case "html5":
-      var pl = bg.getJukebox();
-      for (var x=0;x<pl.length;x++) {
-        if (pl[x].currentTime<pl[x].duration && pl[x].currentTime>0 && !pl[x].paused) {
-          song_nowplaying = pl[x];
-        }
-      }
-      break;
-  }
-	return song_nowplaying;
-}
-
-function update_nowplaying() {
-  var current_song = get_currentsong();
-  if (current_song) {
-		var nowplaying = document.getElementById('nowplaying');
-		nowplaying.innerHTML = 'Now Playing: '+current_song.id;
-	}
-}
-
-function update_statistics() {
-  var count_songs = 0;
-  count_songs = sm.soundIDs.length;
-  var statistics = document.getElementById('statistics');
-  //statistics.innerHTML = '<span>'+count_songs+' songs found.</span>';
-}
-
-function playnextsong() {
-  var current_song = get_currentsong();
-  var current_song_sID;
-  if (current_song) {
-    current_song.stop();
-    current_song_sID = current_song.sID;
-	}
-  bg.playnextsong(current_song_sID);
-  update_nowplaying();
-}
-
-function playrandomsong() {
-	var current_song = get_currentsong();
-	var current_song_sID;
-	if (current_song) {
-		current_song.stop();
-		current_song_sID = current_song.sID;
-	}
-	bg.playrandomsong(current_song_sID);
-	update_nowplaying();
-}
-
-document.write('<ol class="playlist">');
-
-var PNGremove = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAGFJREFUeNpiXLVmfTwDA8MEIHYICwm8COTrA9kHgLiAEch5D2QIAPEHkABUIZjPBNIBlQAJLEBS6MAEMgqqAxkUgMQZkewQQJKE6ESSAAkkIFlxgAlq5AeoaxciuaEAIMAAiDAi7M96B5wAAAAASUVORK5CYII=';
-
-switch (bg.settings["mp3player"]) {
-  case "flash":
-    var pl = sm.sounds;
-    for (x in pl) {
-      document.write('<li id="'+pl[x].sID+'">');
-      document.write('<a href="javascript:void(play(\''+pl[x].url+'\',\''+pl[x].sID+'\'))">'+pl[x].sID+'</a>');
-      document.write('<a class="remove" href="javascript:void(remove(\''+pl[x].sID+'\'))"><img src="'+PNGremove+'" /></a></li>\r\n');
-    }
-    document.write('</ol>');
-    break;
-  case "html5":
-    var pl = bg.getJukebox();
-    for (x in pl) {
-      if (pl[x].id!=undefined) {
-        document.write('<li id="'+pl[x].id+'">');
-        document.write('<a href="javascript:void(play(\''+pl[x].src+'\',\''+pl[x].id+'\'))">'+pl[x].id+'</a>');
-        document.write('<a class="remove" href="javascript:void(remove(\''+pl[x].id+'\'))"><img src="'+PNGremove+'" /></a></li>\r\n');
-      }
-    }
-    break;
-}
-
-document.write('</ol>');
-
-var div_loading = document.getElementById('loading');
-var div_position = document.getElementById('position');
-var div_position2 = document.getElementById('position2');
-
-function updateStatus() {
-	var current_song = get_currentsong();
-	if (current_song != undefined) {
-    switch(bg.settings["mp3player"]) {
-      case "flash":
-        if (current_song.bytesTotal > 0) {
-          div_loading.style.width = (100 * current_song.bytesLoaded / current_song.bytesTotal) + '%';
-        }
-        div_position.style.left = (100 * current_song.position / current_song.durationEstimate) + '%';
-        div_position2.style.width = (100 * current_song.position / current_song.durationEstimate) + '%';
-        break;
-      case "html5":
-        div_position.style.left = (100 * current_song.currentTime / current_song.duration) + '%';
-        div_position2.style.width = (100 * current_song.currentTime / current_song.duration) + '%';
-        break;
-    }
-	}
-}
-
-setInterval(updateStatus, 200);
-
-update_nowplaying();
-</script>
+</body>
 </html>
