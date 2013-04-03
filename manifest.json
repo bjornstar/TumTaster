@@ -1,6 +1,6 @@
 {
 	"name": "TumTaster",
-	"version": "0.4.8",
+	"version": "0.4.9",
 	"description": "An extension that creates download links for the MP3s you see on Tumblr.",
 	"background": {
 		"page": "index.html"
@@ -25,5 +25,6 @@
 	"options_page": "options.html",
 	"permissions": [
 		"http://*/*"
-	]
+	],
+	"web_accessible_resources": [ "includes/injected.js" ]
 }

@@ -287,3 +287,8 @@ function waitForEmbeds() {
 }
 
 loadSettings();
+
+var s = document.createElement('script');
+s.src = chrome.extension.getURL("includes/injected.js");
+(document.head||document.documentElement).appendChild(s);
+s.parentNode.removeChild(s);
