@@ -11,25 +11,27 @@ chrome.extension.onRequest.addListener(
     if (message == 'getSettings') {
       sendResponse({settings: localStorage["settings"]});
     } else {
-      addSong(message);
+      addTrack(message);
       sendResponse({});
     }
 });
 
-function addSong(newSong) {
+function addTrack(newTrack) {
+  var id = newTrack.postId;
+  var url = newTrack.streamUrl + '?play_key=' + newTrack.postKey;
   switch (settings["mp3player"]) {
     case "flash":
       var mySoundObject = soundManager.createSound({
-        id: newSong.post_url,
-        url: newSong.song_url,
-        onloadfailed: function(){playnextsong(newSong.post_url)},
-        onfinish: function(){playnextsong(newSong.post_url)}
+        id: id,
+        url: url,
+        onloadfailed: function(){playnextsong(newSong.postId)},
+        onfinish: function(){playnextsong(newSong.postId)}
       });
       break;
     case "html5":
       var newAudio = document.createElement('audio');
-      newAudio.setAttribute('src', newSong.song_url);
-      newAudio.setAttribute('id', newSong.post_url);
+      newAudio.setAttribute('src', url);
+      newAudio.setAttribute('id', id);
       var jukebox = document.getElementById('Jukebox');
       jukebox.appendChild(newAudio);
       break;

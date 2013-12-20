@@ -73,19 +73,10 @@ function checkurl(url, filter) {
 	return false;
 }
 
-var posts = {};
+var tracks = {};
 
-function addLinks(postId, streamUrl, postKey, artist, track) {
-	var postContent = document.getElementById('post_content_' + postId);
-
-	var downloadLink = document.createElement('a');
-	downloadLink.setAttribute('href', streamUrl.concat('?play_key=', postKey));
-	downloadLink.textContent = 'Click to download';
-	downloadLink.className = 'tumtaster';
-
-	postContent.appendChild(downloadLink);
-
-	posts[postId] = {
+function makeAudioLink(postId, streamUrl, postKey, artist, track) {
+	tracks[postId] = {
 		postId: postId,
 		streamUrl: streamUrl,
 		postKey: postKey,
@@ -93,29 +84,47 @@ function addLinks(postId, streamUrl, postKey, artist, track) {
 		track: track
 	};
 
-	chrome.extension.sendRequest(posts[postId]);
+	console.log('sending',tracks[postId],'to jukebox.');
+	chrome.extension.sendRequest(tracks[postId]);
+}
+
+function extractAudioData(cnt) {
+	console.log('extracting from',cnt)
+	var postId = cnt.getAttribute('data-post-id');
+	if (!postId || posts[postId]) {
+		console.log('no post, or we already have it.')
+		return;
+	}
+
+	var streamUrl = cnt.getAttribute('data-stream-url');
+	if (!streamUrl) {
+		console.log('no streamurl')
+		return;
+	}
+
+	var postKey = cnt.getAttribute('data-post-key');
+	if (!postKey) {
+		console.log('no postkey')
+		return;
+	}
+
+	var artist = cnt.getAttribute('data-artist');
+	var track = cnt.getAttribute('data-track');
+
+	makeAudioLink(postId, streamUrl, postKey, artist, track);
 }
 
 function handleNodeInserted(event) {
-	var postId = event.target.getAttribute('data-post-id');
-	if (!postId || posts[postId]) {
-		return;
+	snarfAudioPlayers(event.target);
+}
+
+function snarfAudioPlayers(t) {
+	var audioPlayers = t.querySelectorAll('.audio_player_container');
+	console.log('found', audioPlayers.length, 'audio players.');
+	for (var i = 0; i < audioPlayers.length; i += 1) {
+		audioPlayer = audioPlayers[i];
+		extractAudioData(audioPlayer);
 	}
-
-	var streamUrl = event.target.getAttribute('data-stream-url');
-	if (!streamUrl) {
-		return;
-	}
-
-	var postKey = event.target.getAttribute('data-post-key');
-	if (!postKey) {
-		return;
-	}
-
-	var artist = event.target.getAttribute('data-artist');
-	var track = event.target.getAttribute('data-track');
-
-	makeAudioLink(postId, streamUrl, postKey, artist, track);
 }
 
 
@@ -194,11 +203,21 @@ function loadSettings() {
 			settings = defaultSettings;
 		}
 
-		if (checkurl(location.href, settings['listSites'])) {
-			addTumtasterStyle();
-			wireupnodes();
+		if (!checkurl(location.href, settings['listSites'])) {
+			console.log('not checking', location.href)
+			return;
 		}
+
+		addTumtasterStyle();
+		wireupnodes();
+
+		snarfAudioPlayers(document);
 	});
 }
 
-loadSettings();
+if (document.readyState === 'complete') {
+	loadSettings();
+} else {
+	console.log(document.readyState, 'waiting for loaded.');
+	document.addEventListener("DOMContentLoaded", loadSettings);
+}
