@@ -1,5 +1,3 @@
-var nowplaying = null;
-
 if (localStorage["settings"] == undefined) {
   settings = defaultSettings;
 } else {
@@ -32,11 +30,6 @@ function getJukebox() {
   return jukebox;
 }
 
-function removeSong(rSong) {
-  var remove_song = document.getElementById(rSong);
-  remove_song.parentNode.removeChild(remove_song);
-}
-
 function playnextsong(previous_song) {
   var bad_idea = null;
   var first_song = null;
@@ -55,7 +48,7 @@ function playnextsong(previous_song) {
     var s = Math.floor(Math.random()*soundManager.soundIDs.length+1);
     next_song = soundManager.soundIDs[s];
   }
-  
+
   if (settings["repeat"] && bad_idea == previous_song) {
     next_song = first_song;
   }

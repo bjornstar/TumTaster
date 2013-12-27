@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
         e.stopPropagation();
     }, false);
     aSong.href = "#";
-    aSong.innerHTML = pl[x].sID;
+    aSong.textContent = pl[x].sID;
     var aRemove = document.createElement('a');
     aRemove.className = "remove";
     aRemove.href = "#";
@@ -77,81 +77,51 @@ document.addEventListener("DOMContentLoaded", function () {
     liSong.appendChild(aSong);
     liSong.appendChild(aRemove);
     playlist.appendChild(liSong);
-    //document.write('<li id="'+pl[x].sID+'">');
-    //document.write('<a href="javascript:void(play(\''+pl[x].url+'\',\''+pl[x].sID+'\'))">'+pl[x].sID+'</a>');
-    //document.write('<a class="remove" href="javascript:void(remove(\''+pl[x].sID+'\'))"><img src="'+PNGremove+'" /></a></li>\r\n');
   }
 });
 
 function remove(song_id) {
-  switch (bg.settings["mp3player"]) {
-    case "flash":
-      sm.destroySound(song_id);
-      var song_li = document.getElementById(song_id);
-      song_li.parentNode.parentNode.removeChild(song_li.parentNode);
-      break;
-    case "html5":
-      bg.removeSong(song_id);
-      var song_li = document.getElementById(song_id);
-      song_li.parentNode.parentNode.removeChild(song_li.parentNode);
-      break;
-  }
+	sm.destroySound(song_id);
+
+	var song_li = document.getElementById(song_id);
+	song_li.parentNode.parentNode.removeChild(song_li.parentNode);
 }
 
 function pause() {
-  current_song = get_currentsong();
-  current_song.pause();
+  track = getPlaying();
+  track.pause();
 }
 
 function play(song_url,post_url) {
-  switch (bg.settings["mp3player"]) {
-    case "flash":
-      sm.stopAll();
-      var mySoundObject = sm.getSoundById(post_url);
-      mySoundObject.play();
-      break;
-    case "html5":
-      bg.playSong(song_url,post_url);
-      break;
-  }
+	sm.stopAll();
+
+	var sound = sm.getSoundById(post_url);
+	sound.play();
 }
 
-function get_currentsong() {
-	var song_nowplaying = null;
-	switch (bg.settings["mp3player"]){
-	case "flash":
-		for (sound in sm.sounds) {
-			if (sm.sounds[sound].playState == 1 && !song_nowplaying) {
-				song_nowplaying = sm.sounds[sound];
-			}
+function getPlaying() {
+	for (sound in sm.sounds) {
+		if (sm.sounds[sound].playState == 1) {
+			return sm.sounds[sound];
 		}
-		break;
-	case "html5":
-		var pl = bg.getJukebox();
-		for (var x=0;x<pl.length;x++) {
-			if (pl[x].currentTime<pl[x].duration && pl[x].currentTime>0 && !pl[x].paused) {
-				song_nowplaying = pl[x];
-			}
-		}
-		break;
 	}
-	return song_nowplaying;
 }
 
 function playnextsong() {
-	var current_song = get_currentsong();
-	var current_song_sID;
+	var track = getPlaying();
 
-	if (current_song) {
-		current_song.stop();
-		current_song_sID = current_song.sID;
+	var track_sID;
+
+	if (track) {
+		track.stop();
+		track_sID = track.sID;
 	}
 
-	bg.playnextsong(current_song_sID);
+	bg.playnextsong(track_sID);
 }
 
 function playrandomsong() {
-	var current_song = get_currentsong();
+	var current_song = getPlaying();
 	var current_song_sID;
 	if (current_song) {
 		current_song.stop();
@@ -161,17 +131,23 @@ function playrandomsong() {
 }
 
 function updateStatus() {
-	var current_song = get_currentsong();
+	var track = getPlaying();
 
-	if (current_song) {
-    if (current_song.bytesTotal) {
-      div_loading.style.width = (100 * current_song.bytesLoaded / current_song.bytesTotal) + '%';
-    }
-    div_position.style.left = (100 * current_song.position / current_song.durationEstimate) + '%';
-    div_position2.style.width = (100 * current_song.position / current_song.durationEstimate) + '%';
+	if (track) {
+		var bytesLoaded = track.bytesLoaded;
+		var bytesTotal = track.bytesTotal;
+		var position = track.position;
+		var durationEstimate = track.durationEstimate;
+
+		if (bytesTotal) {
+			div_loading.style.width = (100 * bytesLoaded / bytesTotal) + '%';
+		}
+
+		div_position.style.left = (100 * position / durationEstimate) + '%';
+		div_position2.style.width = (100 * position / durationEstimate) + '%';
 	}
 
-	if (current_song && nowplaying.innerHTML != current_song.id) {
-		nowplaying.innerHTML = current_song.id;
+	if (track && nowplaying.textContent !== track.id) {
+		nowplaying.textContent = track.id;
 	}
 }
