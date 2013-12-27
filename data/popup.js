@@ -50,51 +50,36 @@ document.addEventListener("DOMContentLoaded", function () {
   var PNGremove = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAGFJREFUeNpiXLVmfTwDA8MEIHYICwm8COTrA9kHgLiAEch5D2QIAPEHkABUIZjPBNIBlQAJLEBS6MAEMgqqAxkUgMQZkewQQJKE6ESSAAkkIFlxgAlq5AeoaxciuaEAIMAAiDAi7M96B5wAAAAASUVORK5CYII=';
 
   setInterval(updateStatus, 200);
-
-  switch (bg.settings["mp3player"]) {
-    case "flash":
-      var pl = sm.sounds;
-      for (x in pl) {
-        var liSong = document.createElement('li');
-        var aSong = document.createElement('a');
-        aSong.id = pl[x].sID;
-        aSong.addEventListener("click", function(e) {
-            play(null, e.target.id);
-            e.preventDefault();
-            e.stopPropagation();
-        }, false);
-        aSong.href = "#";
-        aSong.innerHTML = pl[x].sID;
-        var aRemove = document.createElement('a');
-        aRemove.className = "remove";
-        aRemove.href = "#";
-        aRemove.addEventListener("click", function(e) {
-            console.log(e.target.parentNode.previousSibling.id);
-            remove(e.target.parentNode.previousSibling.id);
-            e.preventDefault();
-            e.stopPropagation();
-        }, false);
-        var imgRemove = document.createElement('img');
-        imgRemove.src = PNGremove;
-        aRemove.appendChild(imgRemove);
-        liSong.appendChild(aSong);
-        liSong.appendChild(aRemove);
-        playlist.appendChild(liSong);
-        //document.write('<li id="'+pl[x].sID+'">');
-        //document.write('<a href="javascript:void(play(\''+pl[x].url+'\',\''+pl[x].sID+'\'))">'+pl[x].sID+'</a>');
-        //document.write('<a class="remove" href="javascript:void(remove(\''+pl[x].sID+'\'))"><img src="'+PNGremove+'" /></a></li>\r\n');
-      }
-      break;
-    case "html5":
-      var pl = bg.getJukebox();
-      for (x in pl) {
-        if (pl[x].id!=undefined) {
-          //document.write('<li id="'+pl[x].id+'">');
-          //document.write('<a href="javascript:void(play(\''+pl[x].src+'\',\''+pl[x].id+'\'))">'+pl[x].id+'</a>');
-          //document.write('<a class="remove" href="javascript:void(remove(\''+pl[x].id+'\'))"><img src="'+PNGremove+'" /></a></li>\r\n');
-        }
-      }
-      break;
+  var pl = sm.sounds;
+  for (x in pl) {
+    var liSong = document.createElement('li');
+    var aSong = document.createElement('a');
+    aSong.id = pl[x].sID;
+    aSong.addEventListener("click", function(e) {
+        play(null, e.target.id);
+        e.preventDefault();
+        e.stopPropagation();
+    }, false);
+    aSong.href = "#";
+    aSong.innerHTML = pl[x].sID;
+    var aRemove = document.createElement('a');
+    aRemove.className = "remove";
+    aRemove.href = "#";
+    aRemove.addEventListener("click", function(e) {
+        console.log(e.target.parentNode.previousSibling.id);
+        remove(e.target.parentNode.previousSibling.id);
+        e.preventDefault();
+        e.stopPropagation();
+    }, false);
+    var imgRemove = document.createElement('img');
+    imgRemove.src = PNGremove;
+    aRemove.appendChild(imgRemove);
+    liSong.appendChild(aSong);
+    liSong.appendChild(aRemove);
+    playlist.appendChild(liSong);
+    //document.write('<li id="'+pl[x].sID+'">');
+    //document.write('<a href="javascript:void(play(\''+pl[x].url+'\',\''+pl[x].sID+'\'))">'+pl[x].sID+'</a>');
+    //document.write('<a class="remove" href="javascript:void(remove(\''+pl[x].sID+'\'))"><img src="'+PNGremove+'" /></a></li>\r\n');
   }
 });
 
@@ -177,21 +162,15 @@ function playrandomsong() {
 
 function updateStatus() {
 	var current_song = get_currentsong();
-	if (current_song != undefined) {
-		switch(bg.settings["mp3player"]) {
-		case "flash":
-			if (current_song.bytesTotal > 0) {
-			div_loading.style.width = (100 * current_song.bytesLoaded / current_song.bytesTotal) + '%';
-			}
-			div_position.style.left = (100 * current_song.position / current_song.durationEstimate) + '%';
-			div_position2.style.width = (100 * current_song.position / current_song.durationEstimate) + '%';
-			break;
-		case "html5":
-			div_position.style.left = (100 * current_song.currentTime / current_song.duration) + '%';
-			div_position2.style.width = (100 * current_song.currentTime / current_song.duration) + '%';
-			break;
-		}
+
+	if (current_song) {
+    if (current_song.bytesTotal) {
+      div_loading.style.width = (100 * current_song.bytesLoaded / current_song.bytesTotal) + '%';
+    }
+    div_position.style.left = (100 * current_song.position / current_song.durationEstimate) + '%';
+    div_position2.style.width = (100 * current_song.position / current_song.durationEstimate) + '%';
 	}
+
 	if (current_song && nowplaying.innerHTML != current_song.id) {
 		nowplaying.innerHTML = current_song.id;
 	}
