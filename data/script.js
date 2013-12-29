@@ -1,23 +1,21 @@
 // TumTaster v0.5.0
 //  - By Bjorn Stromberg (@bjornstar)
 
-var defaultSettings = {
-	shuffle: false,
-	repeat: true,
-	mp3player: 'flash',
-	listBlack: [
-		'beatles'
-	],
-	listWhite: [
-		'bjorn',
-		'beck'
-	],
-	listSites: [
-		'http://*.tumblr.com/*',
-		'http://bjornstar.com/*'
-	],
-	version: '0.5.0'
-}; //initialize default values.
+var settings, started;
+
+function messageHandler(message) {
+	if (message.hasOwnProperty('settings')) {
+		settings = message.settings;
+		startTasting();
+	}
+
+	if (message.hasOwnProperty('track')) {
+		console.log(message.track);
+	}
+}
+
+var port = chrome.runtime.connect();
+port.onMessage.addListener(messageHandler);
 
 function addGlobalStyle(styleID, newRules) {
 	var cStyle, elmStyle, elmHead, newRule;
@@ -59,8 +57,6 @@ function addGlobalStyle(styleID, newRules) {
 	return true;
 }
 
-var settings;
-
 function checkurl(url, filter) {
 	for (var f in filter) {
 		var filterRegex;
@@ -75,43 +71,59 @@ function checkurl(url, filter) {
 
 var tracks = {};
 
-function makeAudioLink(postId, streamUrl, postKey, artist, track) {
+function makeTumblrLink(dataset) {
+	var postId = dataset.postId;
+
 	tracks[postId] = {
 		postId: postId,
-		streamUrl: streamUrl,
-		postKey: postKey,
-		artist: artist,
-		track: track
+		streamUrl: dataset.streamUrl,
+		postKey: dataset.postKey,
+		artist: dataset.artist,
+		track: dataset.track
 	};
 
-	console.log('sending',tracks[postId],'to jukebox.');
-	chrome.extension.sendRequest(tracks[postId]);
+	port.postMessage({ track: tracks[postId] });
 }
 
-function extractAudioData(cnt) {
-	console.log('extracting from',cnt)
-	var postId = cnt.getAttribute('data-post-id');
-	if (!postId || posts[postId]) {
+function makeSoundCloudLink(dataset, url) {
+	var qs = url.split('?')[1];
+	var chunks = qs.split('&');
+
+	var url;
+	for (var i = 0; i < chunks.length; i += 1) {
+		if (chunks[i].indexOf('url=') === 0) {
+			url = decodeURIComponent(chunks[i].substring(4));
+			break;
+		}
+	}
+
+	console.log(url + '/download?client_id=0b9cb426e9ffaf2af34e68ae54272549');
+}
+
+function extractAudioData(post) {
+	var postId = post.dataset.postId;
+	if (!postId || tracks[postId]) {
 		console.log('no post, or we already have it.')
 		return;
 	}
 
-	var streamUrl = cnt.getAttribute('data-stream-url');
-	if (!streamUrl) {
-		console.log('no streamurl')
+	if (!post.dataset.streamUrl) {
+		var soundcloud = post.querySelector('.soundcloud_audio_player');
+
+		if (soundcloud) {
+			return makeSoundCloudLink(post.dataset, soundcloud.src);
+		}
+
+		console.log('no streamUrl')
 		return;
 	}
 
-	var postKey = cnt.getAttribute('data-post-key');
-	if (!postKey) {
+	if (!post.dataset.dataPostKey) {
 		console.log('no postkey')
 		return;
 	}
 
-	var artist = cnt.getAttribute('data-artist');
-	var track = cnt.getAttribute('data-track');
-
-	makeAudioLink(postId, streamUrl, postKey, artist, track);
+	makeTumblrLink(post.dataset);
 }
 
 function handleNodeInserted(event) {
@@ -119,11 +131,11 @@ function handleNodeInserted(event) {
 }
 
 function snarfAudioPlayers(t) {
-	var audioPlayers = t.querySelectorAll('.audio_player_container');
-	console.log('found', audioPlayers.length, 'audio players.');
-	for (var i = 0; i < audioPlayers.length; i += 1) {
-		audioPlayer = audioPlayers[i];
-		extractAudioData(audioPlayer);
+	var audioPosts = t.querySelectorAll('.post.is_audio');
+
+	for (var i = 0; i < audioPosts.length; i += 1) {
+		var audioPost = audioPosts[i];
+		extractAudioData(audioPost);
 	}
 }
 
@@ -134,7 +146,7 @@ function addTumtasterStyle() {
 	var cssRules = [];
 	cssRules.push('a.tumtaster: {　' + tumtaster_style + ' }');
 
-	addGlobalStyle('tumtaster', cssRules);	
+	addGlobalStyle('tumtaster', cssRules);
 }
 
 function wireupnodes() {
@@ -193,31 +205,29 @@ function wireupnodes() {
 // 2013-12-18: Today's tumblr audio url
 //  - http://www.tumblr.com/audio_file/no-mosexual/69952464733/tumblr_mxs96tnYi71r721wf?play_key=e6ba8f023e92bbb5aaf06052cd0c6551
 
-function loadSettings() {
-	chrome.extension.sendRequest('getSettings', function(response) {
-		savedSettings = response.settings;
+// 2013-12-29: Today's soundcloud audio url
+// - https://api.soundcloud.com/tracks/89350110/download?client_id=0b9cb426e9ffaf2af34e68ae54272549
 
-		try {
-			settings = JSON.parse(savedSettings);
-		} catch (e) {
-			settings = defaultSettings;
-		}
+function startTasting() {
+	if (document.readyState === 'loading' || !settings || started) {
+		return;
+	}
 
-		if (!checkurl(location.href, settings['listSites'])) {
-			console.log('not checking', location.href)
-			return;
-		}
+	started = true;
 
-		addTumtasterStyle();
-		wireupnodes();
+	if (!checkurl(location.href, settings['listSites'])) {
+		console.log('not checking', location.href)
+		return;
+	}
 
-		snarfAudioPlayers(document);
-	});
+	console.log('Now tasting', location.href);
+
+	addTumtasterStyle();
+	wireupnodes();
+
+	snarfAudioPlayers(document);
 }
 
-if (document.readyState === 'complete') {
-	loadSettings();
-} else {
-	console.log(document.readyState, 'waiting for loaded.');
-	document.addEventListener("DOMContentLoaded", loadSettings);
-}
+document.addEventListener("DOMContentLoaded", startTasting);
+
+startTasting();

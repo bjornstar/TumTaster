@@ -4,15 +4,25 @@ if (localStorage["settings"] == undefined) {
   settings = JSON.parse(localStorage["settings"]);
 }
 
-chrome.extension.onRequest.addListener(
-  function(message, sender, sendResponse) {
-    if (message == 'getSettings') {
-      sendResponse({settings: localStorage["settings"]});
-    } else {
-      addTrack(message);
-      sendResponse({});
-    }
-});
+function messageHandler(port, message) {
+	if (message === 'getSettings') {
+		return port.postMessage({ settings: settings});
+	}
+
+	if (message.hasOwnProperty('track')) {
+		return addTrack(message.track);
+	}
+}
+
+function connectHandler(port) {
+	port.onMessage.addListener(function onMessageHandler(message) {
+		messageHandler(port, message);
+	});
+
+	port.postMessage({ settings: settings });
+}
+
+chrome.runtime.onConnect.addListener(connectHandler);
 
 function addTrack(newTrack) {
   var id = newTrack.postId;
