@@ -2,7 +2,6 @@ var defaultSettings = { //initialize default values.
 	'version': '0.5.0',
 	'shuffle': false,
 	'repeat': true,
-	'mp3player': 'flash',
 	'listBlack': [
 		'beatles'
 	],

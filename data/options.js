@@ -40,31 +40,22 @@ function loadOptions() {
 
   var cbShuffle = document.getElementById("optionShuffle");
   cbShuffle.checked = settings['shuffle'];
-  
+
   var cbRepeat = document.getElementById("optionRepeat");
   cbRepeat.checked = settings['repeat'];
 
-  var select = document.getElementById("optionMP3Player");
-  for (var i = 0; i < select.children.length; i++) {
-    var child = select.children[i];
-    if (child.value == settings['mp3player']) {
-      child.selected = "true";
-      break;
-    }
-  }
-  
   for (var itemBlack in settings['listBlack']) {
     addInput("Black", settings['listBlack'][itemBlack]);
   }
-  
+
   for (var itemWhite in settings['listWhite']) {
     addInput("White", settings['listWhite'][itemWhite]);
   }
-  
+
   for (var itemSites in settings['listSites']) {
     addInput("Sites", settings['listSites'][itemSites]);
   }
-  
+
   addInput("Black"); //prepare a blank input box.
   addInput("White"); //prepare a blank input box.
   addInput("Sites"); //prepare a blank input box.
@@ -76,12 +67,12 @@ function loadOptions() {
     var browser_span = document.getElementById('browser_span');
     browser_span.innerHTML = "for Opera&trade;";
   }
-  
+
   if (typeof chrome != 'undefined') {
     var browser_span = document.getElementById('browser_span');
-    browser_span.innerHTML = "for Chrome&trade;";          
+    browser_span.innerHTML = "for Chrome&trade;";
   }
-  
+
   if (typeof safari != 'undefined') {
     var browser_span = document.getElementById('browser_span');
     browser_span.innerHTML = "for Safari&trade;";
@@ -123,12 +114,9 @@ function saveOptions() {
 
   var cbShuffle = document.getElementById('optionShuffle');
   settings['shuffle'] = cbShuffle.checked;
-  
+
   var cbRepeat = document.getElementById('optionRepeat');
   settings['repeat'] = cbRepeat.checked;
-  
-  var selectMP3Player = document.getElementById('optionMP3Player');
-  settings['mp3player'] = selectMP3Player.children[selectMP3Player.selectedIndex].value;
 
   settings['listWhite'] = [];
   settings['listBlack'] = [];

@@ -1,7 +1,46 @@
-if (localStorage["settings"] == undefined) {
-  settings = defaultSettings;
-} else {
-  settings = JSON.parse(localStorage["settings"]);
+var API_KEY = '0b9cb426e9ffaf2af34e68ae54272549';
+
+var settings = defaultSettings;
+
+try {
+	settings = JSON.parse(localStorage["settings"]);
+} catch (e) {
+
+}
+
+var ports = {};
+var tracks = {};
+
+function addTrack(newTrack) {
+	var id = newTrack.postId;
+	var url = newTrack.streamUrl;
+
+	if (newTrack.postKey) {
+		url = url + '?play_key=' + newTrack.postKey;
+	}
+
+	if (newTrack.type === 'soundcloud') {
+		url = url + '/download?client_id=' + API_KEY;
+	}
+
+	newTrack.downloadUrl = url;
+
+	soundManager.createSound({
+		id: id,
+		url: url,
+		onloadfailed: function(){playnextsong(newTrack.postId)},
+		onfinish: function(){playnextsong(newTrack.postId)}
+	});
+
+	tracks[id] = newTrack;
+
+	broadcast({ track: newTrack });
+}
+
+function broadcast(msg) {
+	for (var portId in ports) {
+		ports[portId].postMessage(msg);
+	}
 }
 
 function messageHandler(port, message) {
@@ -10,35 +49,29 @@ function messageHandler(port, message) {
 	}
 
 	if (message.hasOwnProperty('track')) {
-		return addTrack(message.track);
+		addTrack(message.track);
 	}
 }
 
 function connectHandler(port) {
+	ports[port.portId_] = port;
+
 	port.onMessage.addListener(function onMessageHandler(message) {
 		messageHandler(port, message);
 	});
 
 	port.postMessage({ settings: settings });
+
+	port.onDisconnect.addListener(function onDisconnectHandler() {
+		disconnectHandler(port);
+	});
+}
+
+function disconnectHandler(port) {
+	delete ports[port.portId_];
 }
 
 chrome.runtime.onConnect.addListener(connectHandler);
-
-function addTrack(newTrack) {
-  var id = newTrack.postId;
-  var url = newTrack.streamUrl + '?play_key=' + newTrack.postKey;
-  var mySoundObject = soundManager.createSound({
-    id: id,
-    url: url,
-    onloadfailed: function(){playnextsong(newTrack.postId)},
-    onfinish: function(){playnextsong(newTrack.postId)}
-  });
-}
-
-function getJukebox() {
-  var jukebox = document.getElementsByTagName('audio');
-  return jukebox;
-}
 
 function playnextsong(previous_song) {
   var bad_idea = null;

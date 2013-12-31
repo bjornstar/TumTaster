@@ -1,7 +1,25 @@
-// TumTaster v0.5.0
+// TumTaster v0.5.0 -- http://tumtaster.bjornstar.com
 //  - By Bjorn Stromberg (@bjornstar)
 
 var settings, started;
+
+function addLink(track) {
+	var post = document.getElementById('post_' + track.postId);
+	if (!post) {
+		return;
+	}
+
+	var footer = post.querySelector('.post_footer');
+	if (footer) {
+		var divDownload = document.createElement('DIV');
+		divDownload.className = 'tumtaster';
+		var aDownload = document.createElement('A');
+		aDownload.href = track.downloadUrl;
+		aDownload.textContent = 'Download';
+		divDownload.appendChild(aDownload);
+		footer.insertBefore(divDownload, footer.children[1]);
+	}
+}
 
 function messageHandler(message) {
 	if (message.hasOwnProperty('settings')) {
@@ -10,7 +28,7 @@ function messageHandler(message) {
 	}
 
 	if (message.hasOwnProperty('track')) {
-		console.log(message.track);
+		addLink(message.track);
 	}
 }
 
@@ -79,7 +97,8 @@ function makeTumblrLink(dataset) {
 		streamUrl: dataset.streamUrl,
 		postKey: dataset.postKey,
 		artist: dataset.artist,
-		track: dataset.track
+		track: dataset.track,
+		type: 'tumblr'
 	};
 
 	port.postMessage({ track: tracks[postId] });
@@ -97,33 +116,34 @@ function makeSoundCloudLink(dataset, url) {
 		}
 	}
 
-	console.log(url + '/download?client_id=0b9cb426e9ffaf2af34e68ae54272549');
+	var postId = dataset.postId;
+
+	tracks[postId] = {
+		postId: postId,
+		streamUrl: url,
+		type: 'soundcloud'
+	};
+
+	port.postMessage({ track: tracks[postId] });
 }
 
 function extractAudioData(post) {
 	var postId = post.dataset.postId;
 	if (!postId || tracks[postId]) {
-		console.log('no post, or we already have it.')
 		return;
 	}
 
-	if (!post.dataset.streamUrl) {
-		var soundcloud = post.querySelector('.soundcloud_audio_player');
+	var soundcloud = post.querySelector('.soundcloud_audio_player');
 
-		if (soundcloud) {
-			return makeSoundCloudLink(post.dataset, soundcloud.src);
-		}
-
-		console.log('no streamUrl')
-		return;
+	if (soundcloud) {
+		return makeSoundCloudLink(post.dataset, soundcloud.src);
 	}
 
-	if (!post.dataset.dataPostKey) {
-		console.log('no postkey')
-		return;
-	}
+	var tumblr = post.querySelector('.audio_player_container');
 
-	makeTumblrLink(post.dataset);
+	if (tumblr) {
+		return makeTumblrLink(tumblr.dataset);
+	}
 }
 
 function handleNodeInserted(event) {
@@ -141,10 +161,9 @@ function snarfAudioPlayers(t) {
 
 
 function addTumtasterStyle() {
-	var tumblr_ico = 'data:image/gif;base64,R0lGODlhEAAQAOZuAD9cdyA3TT5bdkBdeCA3Tj1adTZSbCI6VEFeeUtphDhVb0VjfiM7UjdTbiE4T0dlgEhmgjxYc0lnglZfajRQazlVcENgezpWcbrAxzxZdDtYcyM6UT5adSQ7UkRhfDNPaUhlgUJgezlWcDdUbsDJ1FBpgSI5UCE5UL3EzlZtgz1ZdOHh5UFfepadpt/i6Ofo7cDI0is8TVljbjtXcj9JVi8/UTZSbbS6w3CHnTdTbThUbkVifTpXckdlgUlmgkdkgEpngzZTbSs6Sr/I0TpXcV9wgkZkf2V6j0JfejRJXjNMYzhPZUBbdDtYckFbc46hsuHm7D1YcWZ/lkRifUZkgCI6UUpogzVJXrvEzkhmgThUb4WZrOHl7EVifqu0v72/xba9xipDYENhfEZjf0lngyg0QkpohDRQajVRax82TUtphd/f4+vu8yg/WP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAG4ALAAAAAAQABAAAAfYgG5tg4SFhYIHZooJao2OjWEdbT4SZJZQbE6KZoxqkg8PPSBbbGxllZZAVgxtCwtjT1ylMjhSIFkQEKxiHh6lv2wwTEZUPxttCCxIQy6lGBgtNVM7XccAAANRKKVlSVdLIRYWVW0FBRwCJGwvZdgDAwgIJm1NGhERWCtrZecC/gAn2lQQceECmDVrJmg4UiJDBhUO2jQYoUOLF4QYixDhMSOigY82UtzA+IWGAgUVCLQ5QwGNSyUxJpQpIyRIjgYqD3z4cKZnz5Yu0Rwg4CaN0aNIAygN4CYQADs=';
-	var tumtaster_style = 'background-image:url('+tumblr_ico+'); background-repeat:no-repeat; background-position: 6px 5px; line-height:27px; height:27px; width:207px; vertical-align:middle; font-size:10px; display:block !important; text-align:right; margin-top:1px; font-family:helvetica,arial,sans-serif; text-decoration:none; color:#000000; float:left;';
 	var cssRules = [];
-	cssRules.push('a.tumtaster: {　' + tumtaster_style + ' }');
+	cssRules.push('.tumtaster { float: left; padding-right: 10px; }');
+	cssRules.push('.tumtaster a { text-decoration: none; color: #a7a7a7; }');
 
 	addGlobalStyle('tumtaster', cssRules);
 }
@@ -216,11 +235,9 @@ function startTasting() {
 	started = true;
 
 	if (!checkurl(location.href, settings['listSites'])) {
-		console.log('not checking', location.href)
+		port.disconnect();
 		return;
 	}
-
-	console.log('Now tasting', location.href);
 
 	addTumtasterStyle();
 	wireupnodes();
