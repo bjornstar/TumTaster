@@ -1,8 +1,0 @@
-TumTaster v0.5.0 -- http://tumtaster.bjornstar.com
-By Bjorn Stromberg (@bjornstar)
-
-TumTaster adds download links to posts and also keeps a playlist of all the tracks that you've seen. As of v0.5.0 it also tries to read soundcloud tracks. Unfortunately, most soundcloud tracks cannot be downloaded through their API.
-
-TumTaster uses SoundManager2 for managing MP3 playback. You can get more information about SoundManager2 at: http://www.schillmania.com/projects/soundmanager2
-
-TumTaster for Google Chrome can be installed here - https://chrome.google.com/webstore/detail/nanfbkacbckngfcklahdgfagjlghfbgm

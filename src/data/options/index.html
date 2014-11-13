@@ -1,0 +1,41 @@
+<html>
+	<head>
+		<title>Options for TumTaster</title>
+		<link href="../css/options.css" rel="stylesheet" type="text/css">
+		<link href="../css/font-awesome.min.css" rel="stylesheet" type="text/css">
+		<script src="../defaults.js" type="text/javascript"></script>
+		<script src="index.js" type="text/javascript"></script>
+	</head>
+	<body>
+		<div id="content">
+			<img style="float:left;" src="../images/Icon-64.png">
+			<h1 style="line-height:32px;height:32px;margin-top:16px;">TumTaster Options <span id="browser_span"> </span></h1>
+
+			<div id="shuffle_div">
+				<input type="checkbox" id="optionShuffle" name="optionShuffle" /> <label for="optionShuffle"> Shuffle</label>
+			</div>
+			<div id="repeat_div">
+				<input type="checkbox" id="optionRepeat" name="optionRepeat" /> <label for="optionRepeat"> Repeat</label>
+			</div>
+			<div id="listBlack">
+				<h2>Black List</h2>
+				<p>Do not add music with these words:</p>
+				<a href="#" id="listBlackAdd">add</a><br />
+			</div>
+			<div id="listWhite">
+				<h2>White List</h2>
+				<p>Always add music with these words:</p>
+				<a href="#" id="listWhiteAdd">add</a><br />
+			</div>
+			<div id="listSites">
+				<h2>Site List</h2>
+				<p>Run TumTaster on these sites:</p>
+				<a href="#" id="listSitesAdd">add</a><br />
+			</div>
+			<br />
+			<input id="save_btn" type="button" value="Save" />&nbsp;&nbsp;
+			<input id="reset_btn" type="button" value="Restore default" />
+			<div id="version_div"> </div>
+		</div>
+	</body>
+</html>

@@ -1,24 +1,33 @@
-// TumTaster v0.5.0 -- http://tumtaster.bjornstar.com
+// TumTaster v0.6.0 -- http://tumtaster.bjornstar.com
 //  - By Bjorn Stromberg (@bjornstar)
 
 var settings, started;
 
 function addLink(track) {
-	var post = document.getElementById('post_' + track.postId);
-	if (!post) {
+	var elmPost = document.getElementById('post_' + track.postId);
+	if (!elmPost) {
 		return;
 	}
 
-	var footer = post.querySelector('.post_footer');
-	if (footer) {
-		var divDownload = document.createElement('DIV');
-		divDownload.className = 'tumtaster';
-		var aDownload = document.createElement('A');
-		aDownload.href = track.downloadUrl;
-		aDownload.textContent = 'Download';
-		divDownload.appendChild(aDownload);
-		footer.insertBefore(divDownload, footer.children[1]);
+	var elmFooter = elmPost.querySelector('.post_footer');
+	if (!elmFooter) {
+		return;
 	}
+
+	var divDownload = document.createElement('DIV');
+	divDownload.className = 'tumtaster';
+
+	var aDownload = document.createElement('A');
+	aDownload.href = track.downloadUrl;
+	aDownload.textContent = 'Download';
+
+	if (!track.downloadable) {
+		aDownload.style.setProperty('text-decoration', 'line-through');
+	}
+
+	divDownload.appendChild(aDownload);
+
+	elmFooter.insertBefore(divDownload, elmFooter.children[1]);
 }
 
 function messageHandler(message) {
@@ -78,7 +87,7 @@ function addGlobalStyle(styleID, newRules) {
 function checkurl(url, filter) {
 	for (var f in filter) {
 		var filterRegex;
-		filterRegex=filter[f].replace(/\x2a/g, "(.*?)");
+		filterRegex=filter[f].replace(/\x2a/g, '(.*?)');
 		var re = new RegExp(filterRegex);
 		if (url.match(re)) {
 			return true;
@@ -87,21 +96,21 @@ function checkurl(url, filter) {
 	return false;
 }
 
-var tracks = {};
+var posts = {};
 
 function makeTumblrLink(dataset) {
 	var postId = dataset.postId;
 
-	tracks[postId] = {
+	posts[postId] = {
 		postId: postId,
-		streamUrl: dataset.streamUrl,
+		baseUrl: dataset.streamUrl,
 		postKey: dataset.postKey,
 		artist: dataset.artist,
-		track: dataset.track,
+		title: dataset.track,
 		type: 'tumblr'
 	};
 
-	port.postMessage({ track: tracks[postId] });
+	port.postMessage({ post: posts[postId] });
 }
 
 function makeSoundCloudLink(dataset, url) {
@@ -118,18 +127,18 @@ function makeSoundCloudLink(dataset, url) {
 
 	var postId = dataset.postId;
 
-	tracks[postId] = {
+	posts[postId] = {
 		postId: postId,
-		streamUrl: url,
+		baseUrl: url,
 		type: 'soundcloud'
 	};
 
-	port.postMessage({ track: tracks[postId] });
+	port.postMessage({ post: posts[postId] });
 }
 
 function extractAudioData(post) {
 	var postId = post.dataset.postId;
-	if (!postId || tracks[postId]) {
+	if (!postId || posts[postId]) {
 		return;
 	}
 
@@ -147,7 +156,7 @@ function extractAudioData(post) {
 }
 
 function handleNodeInserted(event) {
-	snarfAudioPlayers(event.target);
+	snarfAudioPlayers(event.target.parentNode);
 }
 
 function snarfAudioPlayers(t) {
@@ -176,45 +185,45 @@ function wireupnodes() {
 	document.addEventListener('webkitAnimationStart', handleNodeInserted, false);
 	document.addEventListener('OAnimationStart', handleNodeInserted, false);
 
-	cssRules[0]  = "@keyframes nodeInserted {";
-	cssRules[0] += "    from { clip: rect(1px, auto, auto, auto); }";
-	cssRules[0] += "    to { clip: rect(0px, auto, auto, auto); }";
-	cssRules[0] += "}";
+	cssRules[0]  = '@keyframes nodeInserted {';
+	cssRules[0] += '    from { clip: rect(1px, auto, auto, auto); }';
+	cssRules[0] += '    to { clip: rect(0px, auto, auto, auto); }';
+	cssRules[0] += '}';
 
-	cssRules[1]  = "@-moz-keyframes nodeInserted {";
-	cssRules[1] += "    from { clip: rect(1px, auto, auto, auto); }";
-	cssRules[1] += "    to { clip: rect(0px, auto, auto, auto); }";
-	cssRules[1] += "}";
+	cssRules[1]  = '@-moz-keyframes nodeInserted {';
+	cssRules[1] += '    from { clip: rect(1px, auto, auto, auto); }';
+	cssRules[1] += '    to { clip: rect(0px, auto, auto, auto); }';
+	cssRules[1] += '}';
 
-	cssRules[2]  = "@-webkit-keyframes nodeInserted {";
-	cssRules[2] += "    from { clip: rect(1px, auto, auto, auto); }";
-	cssRules[2] += "    to { clip: rect(0px, auto, auto, auto); }";
-	cssRules[2] += "}";
+	cssRules[2]  = '@-webkit-keyframes nodeInserted {';
+	cssRules[2] += '    from { clip: rect(1px, auto, auto, auto); }';
+	cssRules[2] += '    to { clip: rect(0px, auto, auto, auto); }';
+	cssRules[2] += '}';
 
-	cssRules[3]  = "@-ms-keyframes nodeInserted {";
-	cssRules[3] += "    from { clip: rect(1px, auto, auto, auto); }";
-	cssRules[3] += "    to { clip: rect(0px, auto, auto, auto); }";
-	cssRules[3] += "}";
+	cssRules[3]  = '@-ms-keyframes nodeInserted {';
+	cssRules[3] += '    from { clip: rect(1px, auto, auto, auto); }';
+	cssRules[3] += '    to { clip: rect(0px, auto, auto, auto); }';
+	cssRules[3] += '}';
 
-	cssRules[4]  = "@-o-keyframes nodeInserted {";
-	cssRules[4] += "    from { clip: rect(1px, auto, auto, auto); }";
-	cssRules[4] += "    to { clip: rect(0px, auto, auto, auto); }";
-	cssRules[4] += "}";
+	cssRules[4]  = '@-o-keyframes nodeInserted {';
+	cssRules[4] += '    from { clip: rect(1px, auto, auto, auto); }';
+	cssRules[4] += '    to { clip: rect(0px, auto, auto, auto); }';
+	cssRules[4] += '}';
 
-	cssRules[5]  = "ol#posts li {";
-	cssRules[5] += "    animation-duration: 1ms;";
-	cssRules[5] += "    -o-animation-duration: 1ms;";
-	cssRules[5] += "    -ms-animation-duration: 1ms;";
-	cssRules[5] += "    -moz-animation-duration: 1ms;";
-	cssRules[5] += "    -webkit-animation-duration: 1ms;";
-	cssRules[5] += "    animation-name: nodeInserted;";
-	cssRules[5] += "    -o-animation-name: nodeInserted;";
-	cssRules[5] += "    -ms-animation-name: nodeInserted;";
-	cssRules[5] += "    -moz-animation-name: nodeInserted;";
-	cssRules[5] += "    -webkit-animation-name: nodeInserted;";
-	cssRules[5] += "}";
+	cssRules[5]  = '.post_container div.post, li.post  {';
+	cssRules[5] += '    animation-duration: 1ms;';
+	cssRules[5] += '    -o-animation-duration: 1ms;';
+	cssRules[5] += '    -ms-animation-duration: 1ms;';
+	cssRules[5] += '    -moz-animation-duration: 1ms;';
+	cssRules[5] += '    -webkit-animation-duration: 1ms;';
+	cssRules[5] += '    animation-name: nodeInserted;';
+	cssRules[5] += '    -o-animation-name: nodeInserted;';
+	cssRules[5] += '    -ms-animation-name: nodeInserted;';
+	cssRules[5] += '    -moz-animation-name: nodeInserted;';
+	cssRules[5] += '    -webkit-animation-name: nodeInserted;';
+	cssRules[5] += '}';
 
-	addGlobalStyle("wires", cssRules);
+	addGlobalStyle('tastyWires', cssRules);
 }
 
 // 2013-01-31: Today's tumblr audio url
@@ -232,12 +241,12 @@ function startTasting() {
 		return;
 	}
 
-	started = true;
-
 	if (!checkurl(location.href, settings['listSites'])) {
 		port.disconnect();
 		return;
 	}
+
+	started = true;
 
 	addTumtasterStyle();
 	wireupnodes();
@@ -245,6 +254,7 @@ function startTasting() {
 	snarfAudioPlayers(document);
 }
 
-document.addEventListener("DOMContentLoaded", startTasting);
+document.onreadystatechange = startTasting;
+document.addEventListener('DOMContentLoaded', startTasting);
 
 startTasting();

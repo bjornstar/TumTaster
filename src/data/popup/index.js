@@ -4,27 +4,38 @@ var sm = bg.soundManager;
 
 var div_loading, div_position, div_position2, nowplaying;
 
+function getPlaying() {
+	for (sound in sm.sounds) {
+		if (sm.sounds[sound].playState == 1) {
+			return sm.sounds[sound];
+		}
+	}
+}
+
+function playPause() {
+	var track = getPlaying();
+
+	if (track) {
+		sm.pauseAll();
+	} else {
+		sm.resumeAll();
+	}
+}
+
 document.addEventListener('DOMContentLoaded', function () {
-	var stopLink = document.getElementById('stop');
-	var pauseLink = document.getElementById('pause');
+	var prevLink = document.getElementById('prev');
 	var playLink = document.getElementById('play');
 	var nextLink = document.getElementById('next');
-	var randomLink = document.getElementById('random');
+	var modeLink = document.getElementById('mode');
 
-	stopLink.addEventListener('click', function(e) {
-		sm.stopAll();
-		e.preventDefault();
-		e.stopPropagation();
-	}, false);
-
-	pauseLink.addEventListener('click', function(e) {
-		pause();
+	prevLink.addEventListener('click', function(e) {
+		prev();
 		e.preventDefault();
 		e.stopPropagation();
 	}, false);
 
 	playLink.addEventListener('click', function(e) {
-		sm.resumeAll();
+		playPause();
 		e.preventDefault();
 		e.stopPropagation();
 	}, false);
@@ -35,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		e.stopPropagation();
 	}, false);
 
-	randomLink.addEventListener('click', function(e) {
+	modeLink.addEventListener('click', function(e) {
 		playrandomsong();
 		e.preventDefault();
 		e.stopPropagation();
@@ -48,15 +59,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	var playlist = document.getElementById('playlist');
 
-	var PNGremove = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAGFJREFUeNpiXLVmfTwDA8MEIHYICwm8COTrA9kHgLiAEch5D2QIAPEHkABUIZjPBNIBlQAJLEBS6MAEMgqqAxkUgMQZkewQQJKE6ESSAAkkIFlxgAlq5AeoaxciuaEAIMAAiDAi7M96B5wAAAAASUVORK5CYII=';
-
-	setInterval(updateStatus, 200);
-
 	for (var id in tracks) {
 		var track = tracks[id];
 
-		var liSong = document.createElement('li');
-		var aSong = document.createElement('a');
+		var liSong = document.createElement('LI');
+		var aSong = document.createElement('A');
 
 		aSong.id = id;
 		aSong.addEventListener('click', function(e) {
@@ -67,13 +74,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		aSong.href = '#';
 
 		var trackDisplay = id;
-		if (track.artist && track.track) {
-			trackDisplay = track.artist + ' - ' + track.track;
+		if (track.artist && track.title) {
+			trackDisplay = track.artist + ' - ' + track.title;
 		}
 
 		aSong.textContent = trackDisplay;
 
-		var aRemove = document.createElement('a');
+		var aRemove = document.createElement('A');
 		aRemove.className = 'remove';
 		aRemove.href = '#';
 		aRemove.addEventListener('click', function(e) {
@@ -82,14 +89,16 @@ document.addEventListener('DOMContentLoaded', function () {
 			e.stopPropagation();
 		}, false);
 
-		var imgRemove = document.createElement('img');
-		imgRemove.src = PNGremove;
+		var iRemove = document.createElement('I');
+		iRemove.className = 'fa fa-remove'
 
-		aRemove.appendChild(imgRemove);
+		aRemove.appendChild(iRemove);
 		liSong.appendChild(aSong);
 		liSong.appendChild(aRemove);
 		playlist.appendChild(liSong);
 	}
+
+	updateStatus();
 });
 
 function remove(song_id) {
@@ -109,14 +118,6 @@ function play(song_url,post_url) {
 
 	var sound = sm.getSoundById(post_url);
 	sound.play();
-}
-
-function getPlaying() {
-	for (sound in sm.sounds) {
-		if (sm.sounds[sound].playState == 1) {
-			return sm.sounds[sound];
-		}
-	}
 }
 
 function playnextsong() {
@@ -166,4 +167,6 @@ function updateStatus() {
 		}
 		nowplaying.textContent = trackDisplay;
 	}
+
+	requestAnimationFrame(updateStatus);
 }
