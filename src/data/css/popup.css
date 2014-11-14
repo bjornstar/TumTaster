@@ -8,24 +8,20 @@ html {
 }
 
 h1 {
-	color:black;
-}
-
-a {
-	color:white;
-	text-decoration:none;
+	color: black;
 }
 
 ol {
 	background-attachment: scroll;
 	background-clip: border-box;
-	background-color: #2C4762;
+	background-color: #36465d;
 	background-image: none;
 	background-origin: padding-box;
 	border-bottom-left-radius: 15px;
 	border-bottom-right-radius: 15px;
 	border-top-left-radius: 15px;
 	border-top-right-radius: 15px;
+	color: #444;
 	display: block;
 	list-style-type: none;
 	margin-bottom: 0px;
@@ -39,10 +35,6 @@ ol {
 	padding-left: 20px;
 	padding-right: 20px;
 	padding-top: 20px;
-}
-
-li a {
-	color:#444;
 }
 
 li {
@@ -131,10 +123,11 @@ div#statistics {
 
 #controls{
 	text-align: center;
-	width: 100%
+	width: 100%;
+	color: white;
 }
 
-#controls a {
+#controls i {
 	margin: 20px;
 }
 
@@ -178,4 +171,8 @@ div#statistics {
 
 .loading {
 	background-color: #BBC552;
+}
+
+.clickable {
+	cursor: hand;
 }

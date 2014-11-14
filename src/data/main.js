@@ -20,6 +20,8 @@ var tracks = {};
 
 var scData = {};
 
+var order = 0;
+
 function getDetails(url, cb) {
 	var xhr = new XMLHttpRequest();
 	xhr.open('GET', url + '.json?client_id=' + API_KEY, true);
@@ -46,7 +48,10 @@ function broadcast(msg) {
 }
 
 function addToLibrary(track, seenBefore) {
+	order += 1;
+
 	var id = track.id;
+	track.order = order;
 
 	broadcast({ track: track });
 
@@ -82,6 +87,7 @@ function addSoundCloudTrack(post, details) {
 		title: details.title,
 		id: details.id,
 
+		seen: post.seen,
 		postId: post.postId
 	};
 
@@ -111,12 +117,16 @@ var addPosts = {
 
 			details = details || {};
 
-			if (details.kind === 'track') {
+			switch (details.kind) {
+			case 'track':
 				return addSoundCloudTrack(post, details);
-			}
-
-			for (var i = 0; i < details.tracks.length; i += 1) {
-				addSoundCloudTrack(post, details.tracks[i]);
+			case 'playlist':
+				for (var i = 0; i < details.tracks.length; i += 1) {
+					addSoundCloudTrack(post, details.tracks[i]);
+				}
+				break;
+			default:
+				console.error('I don\'t know how to handle', details);
 			}
 		});
 	}
@@ -153,39 +163,32 @@ function disconnectHandler(port) {
 
 chrome.runtime.onConnect.addListener(connectHandler);
 
-function playnextsong(previous_song) {
-	var bad_idea = null;
-	var first_song = null;
-	var next_song = null;
-	for (x in soundManager.sounds) {
-		if (soundManager.sounds[x].sID != previous_song && bad_idea == previous_song && next_song == null) {
-			next_song = soundManager.sounds[x].sID;
-		}
-		bad_idea = soundManager.sounds[x].sID;
-		if (first_song == null) {
-			first_song = soundManager.sounds[x].sID;
-		}
+function playnextsong(lastSoundID) {
+	if (!soundManager.soundIDs.length) {
+		return;
 	}
 
-	if (settings['shuffle']) {
-		var s = Math.floor(Math.random()*soundManager.soundIDs.length+1);
-		next_song = soundManager.soundIDs[s];
-	}
+	var currentIndex = soundManager.soundIDs.indexOf(lastSoundID);
 
-	if (settings['repeat'] && bad_idea == previous_song) {
-		next_song = first_song;
-	}
+	var nextIndex = (currentIndex + 1) % soundManager.soundIDs.length;
 
-	if (next_song != null) {
-		var soundNext = soundManager.getSoundById(next_song);
-		soundNext.play();
-	}
+	var nextSound = soundManager.getSoundById(soundManager.soundIDs[nextIndex]);
+
+	nextSound.play();
 }
 
-function playrandomsong(previous_song) {
-	var x = Math.floor(Math.random()*soundManager.soundIDs.length+1);
-	var mySoundObject = soundManager.getSoundById(soundManager.soundIDs[x]);
-	mySoundObject.play();
+function playprevsong(lastSoundID) {
+	if (!soundManager.soundIDs.length) {
+		return;
+	}
+
+	var currentIndex = soundManager.soundIDs.indexOf(lastSoundID);
+
+	var prevIndex = (currentIndex - 1) % soundManager.soundIDs.length;
+
+	var prevSound = soundManager.getSoundById(soundManager.soundIDs[prevIndex]);
+
+	prevSound.play();
 }
 
 document.addEventListener('DOMContentLoaded', function () {

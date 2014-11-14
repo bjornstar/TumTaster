@@ -4,13 +4,16 @@
 var settings, started;
 
 function addLink(track) {
+	console.log(track);
 	var elmPost = document.getElementById('post_' + track.postId);
 	if (!elmPost) {
+		console.error('couldn\'t find post:', track.postId);
 		return;
 	}
 
 	var elmFooter = elmPost.querySelector('.post_footer');
 	if (!elmFooter) {
+		console.error('couldn\'t find footer:', track.postId);
 		return;
 	}
 
@@ -106,6 +109,7 @@ function makeTumblrLink(dataset) {
 		baseUrl: dataset.streamUrl,
 		postKey: dataset.postKey,
 		artist: dataset.artist,
+		seen: Date.now(),
 		title: dataset.track,
 		type: 'tumblr'
 	};
@@ -130,6 +134,7 @@ function makeSoundCloudLink(dataset, url) {
 	posts[postId] = {
 		postId: postId,
 		baseUrl: url,
+		seen: Date.now(),
 		type: 'soundcloud'
 	};
 
