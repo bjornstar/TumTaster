@@ -1,8 +1,8 @@
-// TumTaster v0.6.0 -- http://tumtaster.bjornstar.com
+// TumTaster -- http://tumtaster.bjornstar.com
 //  - By Bjorn Stromberg (@bjornstar)
 
 var defaultSettings = {
-	'version': '0.6.0',
+	'version': '0.6.1',
 	'shuffle': false,
 	'repeat': true,
 	'listBlack': [

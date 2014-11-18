@@ -1,4 +1,4 @@
-// TumTaster v0.6.0 -- http://tumtaster.bjornstar.com
+// TumTaster -- http://tumtaster.bjornstar.com
 //  - By Bjorn Stromberg (@bjornstar)
 
 var API_KEY = '0b9cb426e9ffaf2af34e68ae54272549';
