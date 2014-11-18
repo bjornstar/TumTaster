@@ -154,7 +154,6 @@ function saveOptions() {
 	var garbages = document.getElementsByTagName('input');
 	for (var i = 0; i< garbages.length; i++) {
 		if (garbages[i].value != '') {
-			console.log(garbages[i]);
 			if (garbages[i].name.indexOf('listWhite') !== -1) {
 				settings['listWhite'].push(garbages[i].value);
 			} else if (garbages[i].name.indexOf('listBlack') !== -1) {

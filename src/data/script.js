@@ -1,10 +1,9 @@
-// TumTaster v0.6.0 -- http://tumtaster.bjornstar.com
+// TumTaster -- http://tumtaster.bjornstar.com
 //  - By Bjorn Stromberg (@bjornstar)
 
 var settings, started;
 
 function addLink(track) {
-	console.log(track);
 	var elmPost = document.getElementById('post_' + track.postId);
 	if (!elmPost) {
 		console.error('couldn\'t find post:', track.postId);
@@ -17,7 +16,12 @@ function addLink(track) {
 		return;
 	}
 
-	var divDownload = document.createElement('DIV');
+	var divDownload = elmFooter.querySelector('.tumtaster');
+	if (divDownload) {
+		return;
+	}
+
+	divDownload = document.createElement('DIV');
 	divDownload.className = 'tumtaster';
 
 	var aDownload = document.createElement('A');
@@ -104,20 +108,27 @@ var posts = {};
 function makeTumblrLink(dataset) {
 	var postId = dataset.postId;
 
-	posts[postId] = {
-		postId: postId,
-		baseUrl: dataset.streamUrl,
-		postKey: dataset.postKey,
+	var post = {
 		artist: dataset.artist,
+		baseUrl: dataset.streamUrl,
+		dataset: dataset,
+		postId: postId,
+		postKey: dataset.postKey,
 		seen: Date.now(),
 		title: dataset.track,
 		type: 'tumblr'
 	};
 
-	port.postMessage({ post: posts[postId] });
+	if (!posts[postId]) {
+		posts[postId] = post;
+	}
+
+	port.postMessage({ post: post });
 }
 
 function makeSoundCloudLink(dataset, url) {
+	var postId = dataset.postId;
+
 	var qs = url.split('?')[1];
 	var chunks = qs.split('&');
 
@@ -129,21 +140,25 @@ function makeSoundCloudLink(dataset, url) {
 		}
 	}
 
-	var postId = dataset.postId;
-
-	posts[postId] = {
-		postId: postId,
+	var post = {
 		baseUrl: url,
+		dataset: dataset,
+		postId: postId,
 		seen: Date.now(),
 		type: 'soundcloud'
 	};
 
-	port.postMessage({ post: posts[postId] });
+	if (!posts[postId]) {
+		posts[postId] = post;
+	}
+
+	port.postMessage({ post: post });
 }
 
 function extractAudioData(post) {
 	var postId = post.dataset.postId;
-	if (!postId || posts[postId]) {
+
+	if (!postId) {
 		return;
 	}
 
