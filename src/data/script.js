@@ -155,12 +155,19 @@ function makeSoundCloudLink(dataset, url) {
 	port.postMessage({ post: post });
 }
 
+function extractPermalink(post) {
+	permalink = post.querySelector('.post_permalink') || {};
+	return permalink.href;
+}
+
 function extractAudioData(post) {
 	var postId = post.dataset.postId;
 
 	if (!postId) {
 		return;
 	}
+
+	post.dataset.postUrl = extractPermalink(post);
 
 	var soundcloud = post.querySelector('.soundcloud_audio_player');
 
@@ -171,6 +178,7 @@ function extractAudioData(post) {
 	var tumblr = post.querySelector('.audio_player_container');
 
 	if (tumblr) {
+		tumblr.dataset.postUrl = post.dataset.postUrl;
 		return makeTumblrLink(tumblr.dataset);
 	}
 }
@@ -201,47 +209,20 @@ function wireupnodes() {
 	var cssRules = [];
 
 	document.addEventListener('animationstart', handleNodeInserted, false);
-	document.addEventListener('MSAnimationStart', handleNodeInserted, false);
-	document.addEventListener('webkitAnimationStart', handleNodeInserted, false);
-	document.addEventListener('OAnimationStart', handleNodeInserted, false);
 
-	cssRules[0]  = '@keyframes nodeInserted {';
-	cssRules[0] += '    from { clip: rect(1px, auto, auto, auto); }';
-	cssRules[0] += '    to { clip: rect(0px, auto, auto, auto); }';
-	cssRules[0] += '}';
+	cssRules.push(
+		'@keyframes nodeInserted {' +
+		'    from { clip: rect(1px, auto, auto, auto); }' +
+		'    to { clip: rect(0px, auto, auto, auto); }' +
+		'}'
+	);
 
-	cssRules[1]  = '@-moz-keyframes nodeInserted {';
-	cssRules[1] += '    from { clip: rect(1px, auto, auto, auto); }';
-	cssRules[1] += '    to { clip: rect(0px, auto, auto, auto); }';
-	cssRules[1] += '}';
-
-	cssRules[2]  = '@-webkit-keyframes nodeInserted {';
-	cssRules[2] += '    from { clip: rect(1px, auto, auto, auto); }';
-	cssRules[2] += '    to { clip: rect(0px, auto, auto, auto); }';
-	cssRules[2] += '}';
-
-	cssRules[3]  = '@-ms-keyframes nodeInserted {';
-	cssRules[3] += '    from { clip: rect(1px, auto, auto, auto); }';
-	cssRules[3] += '    to { clip: rect(0px, auto, auto, auto); }';
-	cssRules[3] += '}';
-
-	cssRules[4]  = '@-o-keyframes nodeInserted {';
-	cssRules[4] += '    from { clip: rect(1px, auto, auto, auto); }';
-	cssRules[4] += '    to { clip: rect(0px, auto, auto, auto); }';
-	cssRules[4] += '}';
-
-	cssRules[5]  = '.post_container div.post, li.post  {';
-	cssRules[5] += '    animation-duration: 1ms;';
-	cssRules[5] += '    -o-animation-duration: 1ms;';
-	cssRules[5] += '    -ms-animation-duration: 1ms;';
-	cssRules[5] += '    -moz-animation-duration: 1ms;';
-	cssRules[5] += '    -webkit-animation-duration: 1ms;';
-	cssRules[5] += '    animation-name: nodeInserted;';
-	cssRules[5] += '    -o-animation-name: nodeInserted;';
-	cssRules[5] += '    -ms-animation-name: nodeInserted;';
-	cssRules[5] += '    -moz-animation-name: nodeInserted;';
-	cssRules[5] += '    -webkit-animation-name: nodeInserted;';
-	cssRules[5] += '}';
+	cssRules.push(
+		'.post_container .post {' +
+		'    animation-duration: 1ms;' +
+		'    animation-name: nodeInserted;' +
+		'}'
+	);
 
 	addGlobalStyle('tastyWires', cssRules);
 }

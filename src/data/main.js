@@ -79,6 +79,7 @@ function addSoundCloudTrack(post, details) {
 	var track = {
 		downloadUrl: details.uri + '/download?client_id=' + API_KEY,
 		streamUrl: details.uri + '/stream?client_id=' + API_KEY,
+		permalinkUrl: details.permalink_url,
 
 		downloadable: details.downloadable,
 		streamable: details.streamable,
@@ -88,7 +89,8 @@ function addSoundCloudTrack(post, details) {
 		id: details.id,
 
 		seen: post.seen,
-		postId: post.postId
+		postId: post.postId,
+		postUrl: post.dataset.postUrl
 	};
 
 	var seenBefore = scData.hasOwnProperty(track.id);
@@ -106,6 +108,7 @@ var addPosts = {
 		post.streamable = true;
 
 		post.id = post.postId;
+		post.postUrl = post.dataset.postUrl;
 
 		addToLibrary(post);
 	},

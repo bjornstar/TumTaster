@@ -71,6 +71,14 @@ function togglePause() {
 	skip('forward');
 }
 
+function toggleDisplay(elm, isVisible) {
+	if (isVisible) {
+		elm.className = elm.className.replace(' hidden', '')
+	} else if (!/hidden/.test(elm.className)) {
+		elm.className += ' hidden';
+	}
+}
+
 function getTrackDisplayName(track) {
 	display = [];
 
@@ -105,6 +113,16 @@ function play(soundId) {
 	}
 }
 
+var updateScheduled, updateTracks, trackSlots = [];
+
+function setIsPlaying(track, isPlaying) {
+	for (var i = 0; i < trackSlots.length; i += 1) {
+		if (trackSlots[i].track === track) {
+			return trackSlots[i].isPlaying(isPlaying);
+		}
+	}
+}
+
 var nowPlayingScheduled, scheduleNowPlaying;
 
 function updateNowPlaying() {
@@ -129,8 +147,12 @@ function updateNowPlaying() {
 	divPosition2.style.width = (100 * position / durationEstimate) + '%';
 
 	if (currentTrack !== tracks[sound.sID]) {
+		setIsPlaying(currentTrack, false);
+
 		currentTrack = tracks[sound.sID];
 		nowplaying.textContent = getTrackDisplayName(currentTrack);
+
+		setIsPlaying(currentTrack, true);
 	}
 
 	scheduleNowPlaying();
@@ -150,8 +172,6 @@ var modeIcons = {
 	false: 'fa-retweet'
 };
 
-var updateScheduled, updateTracks, trackSlots = [];
-
 function scheduleUpdate() {
 	updateScheduled = updateScheduled || requestAnimationFrame(updateTracks);
 }
@@ -162,14 +182,34 @@ function TrackSlot(elmParent) {
 	var liTrack = document.createElement('LI');
 
 	var spanTrack = document.createElement('SPAN');
-	spanTrack.className = 'clickable';
+	spanTrack.className = 'clickable trackname';
 
 	var spanRemove = document.createElement('SPAN');
-	spanRemove.className = 'remove clickable fa fa-remove';
+	spanRemove.className = 'remove clickable fa fa-remove fa-2x';
+
+	var aTumblr = document.createElement('A');
+	aTumblr.className = 'clickable fa fa-tumblr fa-2x';
+	aTumblr.target = '_new';
+
+	var aSoundCloud = document.createElement('A');
+	aSoundCloud.className = 'clickable fa fa-soundcloud fa-2x';
+	aSoundCloud.target = '_new';
+
+	var aDownload = document.createElement('A');
+	aDownload.className = 'clickable fa fa-download fa-2x';
+	aDownload.target = '_new';
 
 	this.destroy = function () {
 		elmParent.removeChild(liTrack);
-	}
+	};
+
+	this.isPlaying = function (isPlaying) {
+		if (!isPlaying) {
+			liTrack.className = liTrack.className.replace(' isplaying', '');
+		} else if (!/isplaying/.test(liTrack.className)) {
+			liTrack.className += ' isplaying';
+		}
+	};
 
 	this.play = function () {
 		sm.stopAll();
@@ -196,6 +236,13 @@ function TrackSlot(elmParent) {
 
 		liTrack.id = that.id = id;
 		spanTrack.textContent = getTrackDisplayName(that.track);
+
+		aTumblr.href = that.track.postUrl;
+		aSoundCloud.href = that.track.permalinkUrl;
+		aDownload.href = that.track.downloadUrl;
+
+		toggleDisplay(aSoundCloud, that.track.permalinkUrl);
+		toggleDisplay(aDownload, that.track.downloadable);
 	}
 
 	spanTrack.addEventListener('click', function (e) {
@@ -210,6 +257,9 @@ function TrackSlot(elmParent) {
 		e.stopPropagation();
 	}, false);
 
+	liTrack.appendChild(aTumblr);
+	liTrack.appendChild(aSoundCloud);
+	liTrack.appendChild(aDownload);
 	liTrack.appendChild(spanTrack);
 	liTrack.appendChild(spanRemove);
 
