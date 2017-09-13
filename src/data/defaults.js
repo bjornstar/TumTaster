@@ -2,7 +2,7 @@
 //  - By Bjorn Stromberg (@bjornstar)
 
 var defaultSettings = {
-	'version': '0.7.0',
+	'version': '0.7.1',
 	'shuffle': false,
 	'repeat': true,
 	'listBlack': [

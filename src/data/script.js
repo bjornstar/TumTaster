@@ -105,9 +105,7 @@ function checkurl(url, filter) {
 
 var posts = {};
 
-function makeTumblrLink(dataset) {
-	var postId = dataset.postId;
-
+function makeTumblrLink(dataset, postId) {
 	var post = {
 		artist: dataset.artist,
 		baseUrl: dataset.streamUrl,
@@ -175,11 +173,11 @@ function extractAudioData(post) {
 		return makeSoundCloudLink(post.dataset, soundcloud.src);
 	}
 
-	var tumblr = post.querySelector('.audio_player_container');
+	var tumblr = post.querySelector('.audio_player_container, .native-audio-container');
 
 	if (tumblr) {
 		tumblr.dataset.postUrl = post.dataset.postUrl;
-		return makeTumblrLink(tumblr.dataset);
+		return makeTumblrLink(tumblr.dataset, postId);
 	}
 }
 
