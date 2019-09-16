@@ -1,8 +1,8 @@
 // TumTaster -- http://tumtaster.bjornstar.com
 //  - By Bjorn Stromberg (@bjornstar)
 
-var defaultSettings = {
-	'version': '0.7.1',
+window.defaultSettings = {
+	'version': '1.0.0',
 	'shuffle': false,
 	'repeat': true,
 	'listBlack': [

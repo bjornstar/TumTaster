@@ -1,4 +1,9 @@
-# TumTaster Changelog
+#@bjornstar/TumTaster Changelog
+
+## v1.0.0 - 2019-09-16
+* Only request track and playlist details from soundcloud once per session per id
+* Rename HISTORY.md to CHANGELOG.md
+* Add scope to title in README and CHANGELOG
 
 ## v0.7.1 - 2017-09-13
 * Tumblr changed audio player from `audio_player_container` to `native-audio-container`

@@ -5,3 +5,4 @@
 *.zip
 .DS_Store
 src.safariextension
+node_modules/

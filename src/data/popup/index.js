@@ -1,4 +1,6 @@
-var bg = chrome.extension.getBackgroundPage();
+'use strict';
+
+var bg = window.chrome.extension.getBackgroundPage();
 
 var tracks = bg.tracks;
 var sm = bg.soundManager;
@@ -13,7 +15,7 @@ function getPlayingSound() {
 		return currentSound;
 	}
 
-	for (sound in sm.sounds) {
+	for (let sound in sm.sounds) {
 		if (sm.sounds[sound].playState === 1) {
 			currentSound = sm.sounds[sound];
 			return currentSound;
@@ -73,14 +75,14 @@ function togglePause() {
 
 function toggleDisplay(elm, isVisible) {
 	if (isVisible) {
-		elm.className = elm.className.replace(' hidden', '')
+		elm.className = elm.className.replace(' hidden', '');
 	} else if (!/hidden/.test(elm.className)) {
 		elm.className += ' hidden';
 	}
 }
 
 function getTrackDisplayName(track) {
-	display = [];
+	const display = [];
 
 	if (track.artist) {
 		display.push(track.artist);
@@ -97,23 +99,23 @@ function getTrackDisplayName(track) {
 	return display.join(' - ');
 }
 
-function remove(id) {
+window.remove = (id) => {
 	sm.destroySound(id);
 
 	var elmTrack = document.getElementById(id);
 	playlist.removeChild(elmTrack);
-}
+};
 
-function play(soundId) {
+window.play = (soundId) => {
 	sm.stopAll();
 
 	var sound = sm.getSoundById(soundId);
 	if (sound) {
 		sound.play();
 	}
-}
+};
 
-var updateScheduled, updateTracks, trackSlots = [];
+var updateScheduled, trackSlots = [];
 
 function setIsPlaying(track, isPlaying) {
 	for (var i = 0; i < trackSlots.length; i += 1) {
@@ -123,7 +125,7 @@ function setIsPlaying(track, isPlaying) {
 	}
 }
 
-var nowPlayingScheduled, scheduleNowPlaying;
+var nowPlayingScheduled;
 
 function updateNowPlaying() {
 	nowPlayingScheduled = null;
@@ -222,7 +224,7 @@ function TrackSlot(elmParent) {
 	this.remove = function () {
 		if (that.sound.playState === 1) {
 			sm.stopAll();
-			skip('forward')
+			skip('forward');
 		}
 
 		sm.destroySound(that.sound.sID);
@@ -243,7 +245,7 @@ function TrackSlot(elmParent) {
 
 		toggleDisplay(aSoundCloud, that.track.permalinkUrl);
 		toggleDisplay(aDownload, that.track.downloadable);
-	}
+	};
 
 	spanTrack.addEventListener('click', function (e) {
 		that.play();
@@ -252,7 +254,7 @@ function TrackSlot(elmParent) {
 	}, false);
 
 	spanRemove.addEventListener('click', function (e) {
-		that.remove()
+		that.remove();
 		e.preventDefault();
 		e.stopPropagation();
 	}, false);

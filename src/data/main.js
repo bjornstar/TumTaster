@@ -1,11 +1,12 @@
 // TumTaster -- http://tumtaster.bjornstar.com
 //  - By Bjorn Stromberg (@bjornstar)
+'use strict';
 
-var API_KEY = '0b9cb426e9ffaf2af34e68ae54272549';
+const API_KEY = '0b9cb426e9ffaf2af34e68ae54272549';
 
-var settings = defaultSettings;
+var settings = window.defaultSettings;
 
-var savedSettings = localStorage['settings'];
+const savedSettings = window.localStorage.getItem('settings');
 
 try {
 	if (savedSettings) {
@@ -15,34 +16,41 @@ try {
 	console.error('Failed to parse settings: ', e);
 }
 
-var ports = {};
+const ports = {};
 var tracks = {};
+const urls = {};
 
-var scData = {};
+const soundcloudIds = [];
 
-var order = 0;
+let order = 0;
 
-function getDetails(url, cb) {
-	var xhr = new XMLHttpRequest();
-	xhr.open('GET', url + '.json?client_id=' + API_KEY, true);
+function getDetails(url) {
+	urls[url] = urls[url] || new Promise((resolve, reject) => {
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', url + '.json?client_id=' + API_KEY, true);
 
-	xhr.onreadystatechange = function () {
-		if (xhr.readyState === 4) {
-			var response;
-			try {
-				response = JSON.parse(xhr.responseText);
-			} catch (e) {
-				return cb(e);
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState === 4) {
+				if (xhr.status >= 400) {
+					reject(new Error(`Failed to getDetails: ${xhr.status} ${xhr.statusText}`));
+				}
+
+				try {
+					resolve(JSON.parse(xhr.responseText));
+				} catch (e) {
+					reject(e);
+				}
 			}
-			cb(null, response);
-		}
-	}
+		};
 
-	xhr.send();
+		xhr.send();
+	});
+
+	return urls[url];
 }
 
 function broadcast(msg) {
-	for (var portId in ports) {
+	for (let portId in ports) {
 		ports[portId].postMessage(msg);
 	}
 }
@@ -50,22 +58,22 @@ function broadcast(msg) {
 function addToLibrary(track, seenBefore) {
 	order += 1;
 
-	var id = track.id;
+	const { id } = track;
 	track.order = order;
 
-	broadcast({ track: track });
+	broadcast({ track });
 
 	if (!track.streamable || seenBefore) {
 		return;
 	}
 
 	function failOrFinish() {
-		playnextsong(id);
+		window.playnextsong(id);
 	}
 
 	if (track.streamable) {
-		soundManager.createSound({
-			id: id,
+		window.soundManager.createSound({
+			id,
 			url: track.streamUrl,
 			onloadfailed: failOrFinish,
 			onfinish: failOrFinish
@@ -75,31 +83,25 @@ function addToLibrary(track, seenBefore) {
 	tracks[id] = track;
 }
 
-function addSoundCloudTrack(post, details) {
-	var track = {
-		downloadUrl: details.uri + '/download?client_id=' + API_KEY,
-		streamUrl: details.uri + '/stream?client_id=' + API_KEY,
-		permalinkUrl: details.permalink_url,
-
-		downloadable: details.downloadable,
-		streamable: details.streamable,
-
-		artist: details.user ? details.user.username : '',
-		title: details.title,
-		id: details.id,
-
-		seen: post.seen,
-		postId: post.postId,
-		postUrl: post.dataset.postUrl
+function addSoundCloudTrack({ dataset: { postUrl }, postId, seen }, { downloadable, id, permalink_url, streamable, title, uri, user }) {
+	const track = {
+		artist: user ? user.username : '',
+		downloadable,
+		downloadUrl: `${uri}/download?client_id=${API_KEY}`,
+		id,
+		permalinkUrl: permalink_url,
+		postId,
+		postUrl,
+		seen,
+		streamUrl: `${uri}/stream?client_id=${API_KEY}`,
+		streamable,
+		title
 	};
 
-	var seenBefore = scData.hasOwnProperty(track.id);
-	scData[track.id] = details;
-
-	addToLibrary(track, seenBefore);
+	addToLibrary(track, soundcloudIds.includes(id));
 }
 
-var addPosts = {
+const addPosts = {
 	tumblr: function (post) {
 		post.downloadUrl = post.baseUrl + '?play_key=' + post.postKey;
 		post.streamUrl = post.downloadUrl;
@@ -113,27 +115,21 @@ var addPosts = {
 		addToLibrary(post);
 	},
 	soundcloud: function (post) {
-		getDetails(post.baseUrl, function (e, details) {
-			if (e) {
-				return console.error(error);
-			}
-
-			details = details || {};
-
+		getDetails(post.baseUrl).then(details => {
 			switch (details.kind) {
 			case 'track':
 				return addSoundCloudTrack(post, details);
 			case 'playlist':
-				for (var i = 0; i < details.tracks.length; i += 1) {
+				for (let i = 0; i < details.tracks.length; i += 1) {
 					addSoundCloudTrack(post, details.tracks[i]);
 				}
 				break;
 			default:
 				console.error('I don\'t know how to handle', details);
 			}
-		});
+		}).catch(console.error);
 	}
-}
+};
 
 function messageHandler(port, message) {
 	if (message === 'getSettings') {
@@ -141,7 +137,7 @@ function messageHandler(port, message) {
 	}
 
 	if (message.hasOwnProperty('post')) {
-		var post = message.post;
+		const post = message.post;
 		addPosts[post.type](post);
 	}
 }
@@ -164,36 +160,40 @@ function disconnectHandler(port) {
 	delete ports[port.portId_];
 }
 
-chrome.runtime.onConnect.addListener(connectHandler);
+window.chrome.runtime.onConnect.addListener(connectHandler);
 
-function playnextsong(lastSoundID) {
+window.playnextsong = (lastSoundID) => {
+	const { soundManager } = window;
+
 	if (!soundManager.soundIDs.length) {
 		return;
 	}
 
-	var currentIndex = soundManager.soundIDs.indexOf(lastSoundID);
+	const currentIndex = soundManager.soundIDs.indexOf(lastSoundID);
 
-	var nextIndex = (currentIndex + 1) % soundManager.soundIDs.length;
+	const nextIndex = (currentIndex + 1) % soundManager.soundIDs.length;
 
-	var nextSound = soundManager.getSoundById(soundManager.soundIDs[nextIndex]);
+	const nextSound = soundManager.getSoundById(soundManager.soundIDs[nextIndex]);
 
 	nextSound.play();
-}
+};
 
-function playprevsong(lastSoundID) {
+window.playprevsong = (lastSoundID) => {
+	const { soundManager } = window;
+
 	if (!soundManager.soundIDs.length) {
 		return;
 	}
 
-	var currentIndex = soundManager.soundIDs.indexOf(lastSoundID);
+	const currentIndex = soundManager.soundIDs.indexOf(lastSoundID);
 
-	var prevIndex = (currentIndex - 1) % soundManager.soundIDs.length;
+	const prevIndex = (currentIndex - 1) % soundManager.soundIDs.length;
 
-	var prevSound = soundManager.getSoundById(soundManager.soundIDs[prevIndex]);
+	const prevSound = soundManager.getSoundById(soundManager.soundIDs[prevIndex]);
 
 	prevSound.play();
-}
+};
 
 document.addEventListener('DOMContentLoaded', function () {
-	soundManager.setup({'preferFlash': false});
+	window.soundManager.setup({'preferFlash': false});
 });

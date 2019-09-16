@@ -1,4 +1,4 @@
-# TumTaster
+# @bjornstar/TumTaster
 By [Bjorn Stromberg](http://bjornstar.com/about)
 
 [TumTaster](http://tumtaster.bjornstar.com/) adds download links to audio posts and gives you a playlist of all the tracks that you've seen for easy access.

@@ -1,6 +1,8 @@
 // TumTaster -- http://tumtaster.bjornstar.com
 //  - By Bjorn Stromberg (@bjornstar)
 
+'use strict';
+
 var settings, started;
 
 function addLink(track) {
@@ -48,7 +50,7 @@ function messageHandler(message) {
 	}
 }
 
-var port = chrome.runtime.connect();
+var port = window.chrome.runtime.connect();
 port.onMessage.addListener(messageHandler);
 
 function addGlobalStyle(styleID, newRules) {
@@ -105,15 +107,18 @@ function checkurl(url, filter) {
 
 var posts = {};
 
-function makeTumblrLink(dataset, postId) {
+function makeTumblrLink(dataset, audioDataset) {
+	const { postId } = dataset;
+	const { artist, postKey, streamUrl, track } = audioDataset;
+
 	var post = {
-		artist: dataset.artist,
-		baseUrl: dataset.streamUrl,
-		dataset: dataset,
-		postId: postId,
-		postKey: dataset.postKey,
+		artist,
+		baseUrl: streamUrl,
+		dataset,
+		postId,
+		postKey,
 		seen: Date.now(),
-		title: dataset.track,
+		title: track,
 		type: 'tumblr'
 	};
 
@@ -121,27 +126,27 @@ function makeTumblrLink(dataset, postId) {
 		posts[postId] = post;
 	}
 
-	port.postMessage({ post: post });
+	port.postMessage({ post });
 }
 
 function makeSoundCloudLink(dataset, url) {
-	var postId = dataset.postId;
+	const postId = dataset.postId;
 
-	var qs = url.split('?')[1];
-	var chunks = qs.split('&');
+	const qs = url.split('?')[1];
+	const chunks = qs.split('&');
 
-	var url;
+	var baseUrl;
 	for (var i = 0; i < chunks.length; i += 1) {
 		if (chunks[i].indexOf('url=') === 0) {
-			url = decodeURIComponent(chunks[i].substring(4));
+			baseUrl = decodeURIComponent(chunks[i].substring(4));
 			break;
 		}
 	}
 
 	var post = {
-		baseUrl: url,
-		dataset: dataset,
-		postId: postId,
+		baseUrl,
+		dataset,
+		postId,
 		seen: Date.now(),
 		type: 'soundcloud'
 	};
@@ -150,11 +155,11 @@ function makeSoundCloudLink(dataset, url) {
 		posts[postId] = post;
 	}
 
-	port.postMessage({ post: post });
+	port.postMessage({ post });
 }
 
 function extractPermalink(post) {
-	permalink = post.querySelector('.post_permalink') || {};
+	const permalink = post.querySelector('.post_permalink') || {};
 	return permalink.href;
 }
 
@@ -176,8 +181,7 @@ function extractAudioData(post) {
 	var tumblr = post.querySelector('.audio_player_container, .native-audio-container');
 
 	if (tumblr) {
-		tumblr.dataset.postUrl = post.dataset.postUrl;
-		return makeTumblrLink(tumblr.dataset, postId);
+		return makeTumblrLink(post.dataset, tumblr.dataset);
 	}
 }
 

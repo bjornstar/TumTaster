@@ -1,6 +1,6 @@
 {
 	"name": "TumTaster",
-	"version": "0.7.1",
+	"version": "1.0.0",
 	"description": "Creates download links on Tumblr audio posts.",
 	"background": {
 		"scripts": [

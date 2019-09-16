@@ -1,0 +1,26 @@
+{
+  "name": "@bjornstar/tumtaster",
+  "version": "1.0.0",
+  "description": "Creates download links on Tumblr audio posts.",
+  "scripts": {
+    "test": "eslint src/data"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bjornstar/TumTaster.git"
+  },
+  "keywords": [
+    "webextension",
+    "audio",
+    "mp3"
+  ],
+  "author": "Bjorn Stromberg <bjorn@bjornstar.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bjornstar/TumTaster/issues"
+  },
+  "homepage": "https://github.com/bjornstar/TumTaster#readme",
+  "devDependencies": {
+    "eslint": "^5.1.0"
+  }
+}

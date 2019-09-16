@@ -1,3 +1,5 @@
+'use strict';
+
 var inputLast = 0;
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -8,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	var listSitesAdd = document.getElementById('listSitesAdd');
 
 	save_btn.addEventListener('click', saveOptions);
-	reset_btn.addEventListener('click', function() { if (confirm('Are you sure you want to restore defaults?')) {eraseOptions()} });
+	reset_btn.addEventListener('click', function() { if (confirm('Are you sure you want to restore defaults?')) {eraseOptions();} });
 
 	listWhiteAdd.addEventListener('click', function(e) {
 		addInput('listWhite');
@@ -35,7 +37,7 @@ function loadOptions() {
 	var settings = localStorage['settings'];
 
 	if (settings == undefined) {
-		settings = defaultSettings;
+		settings = window.defaultSettings;
 	} else {
 		settings = JSON.parse(settings);
 	}
@@ -63,20 +65,19 @@ function loadOptions() {
 	addInput('listSites'); //prepare a blank input box.
 
 	var version_div = document.getElementById('version_div');
-	version_div.innerHTML = 'v'+defaultSettings['version']; //use default so we're always showing current version regardless of what people have saved.
+	version_div.innerHTML = 'v'+window.defaultSettings['version']; //use default so we're always showing current version regardless of what people have saved.
+
+	var browser_span = document.getElementById('browser_span');
 
 	if (typeof opera != 'undefined') {
-		var browser_span = document.getElementById('browser_span');
 		browser_span.innerHTML = 'for Opera&trade;';
 	}
 
 	if (typeof chrome != 'undefined') {
-		var browser_span = document.getElementById('browser_span');
 		browser_span.innerHTML = 'for Chrome&trade;';
 	}
 
 	if (typeof safari != 'undefined') {
-		var browser_span = document.getElementById('browser_span');
 		browser_span.innerHTML = 'for Safari&trade;';
 	}
 }
