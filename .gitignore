@@ -4,5 +4,6 @@
 *.xpi
 *.zip
 .DS_Store
-src.safariextension
 node_modules/
+package-lock.json
+src.safariextension
