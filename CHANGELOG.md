@@ -1,5 +1,8 @@
 #@bjornstar/TumTaster Changelog
 
+## v1.0.2 - 2019-09-17
+* Add `build.sh` to generate zip file
+
 ## v1.0.1 - 2019-09-17
 * Do not create or check in `package-lock.json`
 

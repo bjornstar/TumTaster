@@ -2,7 +2,7 @@
 //  - By Bjorn Stromberg (@bjornstar)
 
 window.defaultSettings = {
-	'version': '1.0.0',
+	'version': '1.0.2',
 	'shuffle': false,
 	'repeat': true,
 	'listBlack': [
